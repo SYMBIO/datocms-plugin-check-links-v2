@@ -23,6 +23,7 @@ export default class Main extends Component {
 
   state = {
     loading: true,
+    processing: false,
     data: {},
   };
 
@@ -31,7 +32,7 @@ export default class Main extends Component {
   }
 
   getArtistsRow(rolesLink) {
-    const { data } = this.state;
+    const { processing, data } = this.state;
     const {
       token, fieldPath, getFieldValue, setFieldValue,
     } = this.props;
@@ -47,11 +48,16 @@ export default class Main extends Component {
     });
 
     return (
-      <span>
+      <span key={`artist_${rolesLink.id}`}>
         <input
           type="checkbox"
-          checked={isChecked}
+          defaultChecked={isChecked}
+          disabled={processing}
           onClick={() => {
+            this.setState({
+              processing: true,
+            });
+
             if (!isChecked) {
               const datoClient = new SiteClient(token);
               datoClient.items.create({
@@ -59,23 +65,27 @@ export default class Main extends Component {
                 itemType: '137165',
               })
                 .then((item) => {
-                  console.log(item);
-
                   const currentFieldValue = getFieldValue(fieldPath);
                   currentFieldValue.push(item.id);
                   setFieldValue(fieldPath, currentFieldValue);
 
                   this.updateData(true, item, rolesLink);
+
+                  this.setState({
+                    processing: false,
+                  });
                 })
                 .catch((error) => {
                   console.log(error);
+
+                  this.setState({
+                    processing: false,
+                  });
                 });
             } else {
               const datoClient = new SiteClient(token);
               datoClient.items.destroy(currentID)
-                .then((item) => {
-                  console.log(item);
-
+                .then(() => {
                   const currentFieldValue = getFieldValue(fieldPath);
                   currentFieldValue.splice(getFieldValue(fieldPath).indexOf(currentID), 1);
 
@@ -83,9 +93,17 @@ export default class Main extends Component {
                   data.roles.splice(indexInData, 1);
 
                   setFieldValue(fieldPath, currentFieldValue);
+
+                  this.setState({
+                    processing: false,
+                  });
                 })
                 .catch((error) => {
                   console.log(error);
+
+                  this.setState({
+                    processing: false,
+                  });
                 });
             }
           }
@@ -137,6 +155,7 @@ export default class Main extends Component {
                 }
               },
               roles{
+                id,
                 role{
                   id,
                   role{
@@ -156,8 +175,6 @@ export default class Main extends Component {
             loading: false,
             data: res.data.event,
           });
-
-          console.log(data);
         })
         .catch((error) => {
           this.setState({
@@ -178,7 +195,6 @@ export default class Main extends Component {
       };
       const originalData = data;
       originalData.roles.push(newRecord);
-      console.log(originalData);
 
       this.setState({
         loading: false,
@@ -194,7 +210,6 @@ export default class Main extends Component {
       return <div className="container">Načítám data...</div>;
     }
 
-    console.log(data.production.roles);
     return (
       <div className="container">
         <ul>
@@ -205,7 +220,6 @@ export default class Main extends Component {
                 {title.roles.map(role => (
                   <li key={`title_${title.id}_role${role.id}`}>
                     <h3>{role.title}</h3>
-                    {/* <hr /> */}
                     <ul>
                       {data.production.roles.map((rolesLink) => {
                         if (rolesLink.role.id === role.id) {
