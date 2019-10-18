@@ -109,7 +109,9 @@ export default class Main extends Component {
           }
           }
         />
-        {rolesLink.artist.firstName} {rolesLink.artist.name}
+        {rolesLink.artist.firstName}
+        {' '}
+        {rolesLink.artist.name}
       </span>
     );
   }
