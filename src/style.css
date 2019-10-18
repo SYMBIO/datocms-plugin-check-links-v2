@@ -2,25 +2,34 @@
   background-color: white;
   padding: 0;
   color: #848484;
+  border: solid 1px;
 }
 
 h2 {
   font-size: 1.2rem;
-  padding: 0.25rem 0;
   color: #666;
   font-weight: 500;
+  background-color: #f5f5f5;
+  padding: 5px 10px;
 }
 
 h3 {
   font-size: 1rem;
-  padding: 0.25rem 0;
   font-weight: 500;
   color: #666;
+  border-bottom: solid 1px;
+  padding: 7px 10px 4px;
+  border-top: solid 1px;
+  line-height: 1rem;
 }
 
 .DatoCMS-button svg {
   fill: #ed6b5e;
   margin-right: .5em;
+}
+
+ul li ul li ul {
+  margin: 0 10px;
 }
 
 ul li ul li ul li {

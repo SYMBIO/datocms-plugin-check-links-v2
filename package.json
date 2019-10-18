@@ -49,7 +49,15 @@
           "hint": "The DatoCMS API full-access token, <a href=\"/admin/access_tokens\">get it here</a>"
         }
       ],
-      "instance": []
+      "instance": [
+        {
+          "id": "groupField",
+          "label": "Field to group by",
+          "type": "string",
+          "required": true,
+          "hint": "Insert api name of the field used for grouping"
+        }
+      ]
     }
   },
   "prettier": {
