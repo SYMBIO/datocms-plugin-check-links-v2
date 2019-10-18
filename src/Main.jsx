@@ -137,19 +137,19 @@ export default class Main extends Component {
             event(filter: {id: {eq: "${itemId}"}}) {
               production {
                 id,
-                titles{
+                titles {
                   id,
                   title
                   roles {
                     id, 
-                    title
+                    name
                   }
                 }
                 roles {
                   id,
                   role {
                     id,
-                    title
+                    name
                   },
                   artist{
                     firstName
@@ -157,13 +157,13 @@ export default class Main extends Component {
                   }
                 }
               },
-              roles{
+              roles {
                 id,
-                role{
+                role {
                   id,
-                  role{
+                  role {
                     id,
-                    title
+                    name
                   }
                 }
               }
@@ -174,6 +174,7 @@ export default class Main extends Component {
       })
         .then(res => res.json())
         .then((res) => {
+          console.log(res);
           this.setState({
             loading: false,
             data: res.data.event,
@@ -192,7 +193,7 @@ export default class Main extends Component {
           id: item.role,
           role: {
             id: rolesLink.role.id,
-            title: rolesLink.role.title,
+            name: rolesLink.role.name,
           },
         },
       };
@@ -213,16 +214,21 @@ export default class Main extends Component {
       return <div className="container">Načítám data...</div>;
     }
 
+    console.log(data);
+
     return (
       <div className="container">
         <ul>
           {data.production.titles.map(title => (
             <li key={`title_${title.id}`}>
-              <h2>{title.title}</h2>
+              <h2>
+                Titul:
+                {title.title}
+              </h2>
               <ul>
                 {title.roles.map(role => (
                   <li key={`title_${title.id}_role${role.id}`}>
-                    <h3>{role.title}</h3>
+                    <h3>{role.name}</h3>
                     <ul>
                       {data.production.roles.map((rolesLink) => {
                         if (rolesLink.role.id === role.id) {
