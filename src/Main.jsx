@@ -162,7 +162,7 @@ export default class Main extends Component {
     });
 
     return (
-      <span key={`artist_${staffsLink.id}`}>
+      <li key={`artist_${staffsLink.id}`}>
         <input
           type="checkbox"
           defaultChecked={isChecked}
@@ -227,7 +227,7 @@ export default class Main extends Component {
         {staffsLink.artist.firstName}
         {' '}
         {staffsLink.artist.name}
-      </span>
+      </li>
     );
   }
 
