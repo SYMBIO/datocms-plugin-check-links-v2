@@ -309,7 +309,6 @@ export default class Main extends Component {
       })
         .then(res => res.json())
         .then((res) => {
-          console.log(res);
           this.setState({
             loading: false,
             data: res.data.event,
@@ -322,7 +321,6 @@ export default class Main extends Component {
           console.log(error);
         });
     } else {
-      console.log('rolesLink', rolesLink);
       const newRecord = {
         id: item.id,
         role: {
@@ -410,7 +408,6 @@ export default class Main extends Component {
       })
         .then(res => res.json())
         .then((res) => {
-          console.log(res);
           this.setState({
             loading: false,
             data: res.data.event,
@@ -423,7 +420,6 @@ export default class Main extends Component {
           console.log(error);
         });
     } else {
-      console.log('staffsLink', staffsLink);
       const newRecord = {
         id: item.id,
         staff: {
@@ -436,7 +432,6 @@ export default class Main extends Component {
       };
       const originalData = data;
       originalData.staff.push(newRecord);
-      console.log(originalData.staff);
 
       this.setState({
         loading: false,
@@ -452,8 +447,6 @@ export default class Main extends Component {
     if (loading) {
       return <div className="container">Načítám data...</div>;
     }
-
-    console.log(data);
 
     if (fieldPath === 'roles') {
       return (
