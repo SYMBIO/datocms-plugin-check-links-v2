@@ -56,7 +56,7 @@ export default class Main extends Component {
     });
 
     return (
-      <span key={`artist_${rolesLink.id}`}>
+      <li key={`artist_${rolesLink.id}`}>
         <input
           type="checkbox"
           defaultChecked={isChecked}
@@ -121,7 +121,7 @@ export default class Main extends Component {
         {rolesLink.artist.firstName}
         {' '}
         {rolesLink.artist.name}
-      </span>
+      </li>
     );
   }
 
