@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-export default (mapPluginToProps) => (BaseComponent) => {
-  return class ConnectToDatoCms extends Component {
+export default (mapPluginToProps) => (BaseComponent) => class ConnectToDatoCms extends Component {
     static propTypes = {
       plugin: PropTypes.object.isRequired,
     };
@@ -27,5 +26,4 @@ export default (mapPluginToProps) => (BaseComponent) => {
     render() {
       return <BaseComponent {...this.props} {...this.state} />;
     }
-  };
 };
