@@ -478,11 +478,14 @@ export default class Main extends Component {
           <ul>
             {data.production.titles.map(title => (
               <li key={`title_${title.id}`}>
-                <h2>
-                  Titul:
-                  {' '}
-                  {title.title}
-                </h2>
+                <div>
+                  <h2>
+                    Titul:
+                    {' '}
+                    {title.title}
+                  </h2>
+                  <button type="button">Zaškrtnout vše</button>
+                </div>
                 <ul>
                   {title.staff.map(staff => this.getStaffRow(staff, title, data.production.staff))}
                 </ul>
