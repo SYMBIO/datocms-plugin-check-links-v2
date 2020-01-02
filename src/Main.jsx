@@ -481,8 +481,7 @@ class Main extends Component {
                   <button type="button">Zaškrtnout vše</button>
                 </div>
                 <ul>
-                  {title.roles.map((role) =>
-                    this.getRoleRow(role, title, production.roles),
+                  {title.roles.map((role) => this.getRoleRow(role, title, production.roles),
                   )}
                 </ul>
               </li>
@@ -503,8 +502,7 @@ class Main extends Component {
                   <button type="button">Zaškrtnout vše</button>
                 </div>
                 <ul>
-                  {title.staff.map((staff) =>
-                    this.getStaffRow(staff, title, production.staff),
+                  {title.staff.map((staff) => this.getStaffRow(staff, title, production.staff),
                   )}
                 </ul>
               </li>
