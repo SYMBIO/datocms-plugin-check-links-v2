@@ -63,7 +63,7 @@
   "prettier": {
     "singleQuote": true,
     "arrowParens": "always",
-    "trailingComma": "all",
+    "trailingComma": "all"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.7",
