@@ -456,6 +456,7 @@ export default class Main extends Component {
               <li key={`title_${title.id}`}>
                 <h2>
                   Titul:
+                  {' '}
                   {title.title}
                 </h2>
                 <ul>
@@ -476,6 +477,7 @@ export default class Main extends Component {
               <li key={`title_${title.id}`}>
                 <h2>
                   Titul:
+                  {' '}
                   {title.title}
                 </h2>
                 <ul>
