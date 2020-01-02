@@ -53,10 +53,6 @@ ul li ul li ul li {
   background-color: white;
 }
 
-ul li ul li ul li:hover {
-  border: solid 1px #ddd;
-}
-
 ul li ul li span{
   margin-right: 25px;
 }
