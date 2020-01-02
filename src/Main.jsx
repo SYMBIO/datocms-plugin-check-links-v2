@@ -5,27 +5,24 @@ import { SiteClient } from 'datocms-client';
 import connectToDatoCms from './connectToDatoCms';
 import './style.css';
 
-@connectToDatoCms(plugin => ({
+@connectToDatoCms((plugin) => ({
   token: plugin.parameters.global.datoCmsApiToken,
   itemId: plugin.itemId,
   fieldPath: plugin.fieldPath,
   setFieldValue: plugin.setFieldValue,
   getFieldValue: plugin.getFieldValue,
 }))
-export default class Main extends Component {
-  static propTypes = {
-    token: PropTypes.string,
-    itemId: PropTypes.string,
-    fieldPath: PropTypes.string,
-    setFieldValue: PropTypes.func,
-    getFieldValue: PropTypes.func,
-  };
-
-  state = {
-    loading: true,
-    processing: false,
-    data: {},
-  };
+class Main extends Component {
+  constructor() {
+    super();
+    this.state = {
+      loading: true,
+      processing: false,
+      data: {
+        production: null,
+      },
+    };
+  }
 
   componentDidMount() {
     const { fieldPath } = this.props;
@@ -42,7 +39,11 @@ export default class Main extends Component {
   getArtistsRoleRow(rolesLink) {
     const { processing, data } = this.state;
     const {
-      token, fieldPath, getFieldValue, setFieldValue, itemId,
+      token,
+      fieldPath,
+      getFieldValue,
+      setFieldValue,
+      itemId,
     } = this.props;
     let isChecked = false;
     let currentID;
@@ -57,81 +58,89 @@ export default class Main extends Component {
 
     return (
       <li key={`artist_${rolesLink.id}`}>
-        <input
-          type="checkbox"
-          defaultChecked={isChecked}
-          disabled={processing}
-          onClick={() => {
-            this.setState({
-              processing: true,
-            });
+        <label>
+          <input
+            type="checkbox"
+            defaultChecked={isChecked}
+            disabled={processing}
+            onClick={() => {
+              this.setState({
+                processing: true,
+              });
 
-            if (!isChecked) {
-              const datoClient = new SiteClient(token);
-              datoClient.items.create({
-                event: itemId,
-                role: rolesLink.id,
-                itemType: '137165',
-              })
-                .then((item) => {
-                  const currentFieldValue = getFieldValue(fieldPath);
-                  currentFieldValue.push(item.id);
-                  setFieldValue(fieldPath, currentFieldValue);
+              if (!isChecked) {
+                const datoClient = new SiteClient(token);
+                datoClient.items
+                  .create({
+                    event: itemId,
+                    role: rolesLink.id,
+                    itemType: '137165',
+                  })
+                  .then((item) => {
+                    const currentFieldValue = getFieldValue(fieldPath);
+                    currentFieldValue.push(item.id);
+                    setFieldValue(fieldPath, currentFieldValue);
 
-                  this.updateRolesData(true, item, rolesLink);
+                    this.updateRolesData(true, item, rolesLink);
 
-                  this.setState({
-                    processing: false,
+                    this.setState({
+                      processing: false,
+                    });
+                  })
+                  .catch((error) => {
+                    console.log(error);
+
+                    this.setState({
+                      processing: false,
+                    });
                   });
-                })
-                .catch((error) => {
-                  console.log(error);
+              } else {
+                const datoClient = new SiteClient(token);
+                datoClient.items
+                  .destroy(currentID)
+                  .then(() => {
+                    const currentFieldValue = getFieldValue(fieldPath);
+                    currentFieldValue.splice(
+                      getFieldValue(fieldPath).indexOf(currentID),
+                      1,
+                    );
 
-                  this.setState({
-                    processing: false,
+                    const indexInData = data.roles
+                      .map((e) => e.id)
+                      .indexOf(currentID);
+                    data.roles.splice(indexInData, 1);
+
+                    setFieldValue(fieldPath, currentFieldValue);
+
+                    this.setState({
+                      processing: false,
+                    });
+                  })
+                  .catch((error) => {
+                    console.log(error);
+
+                    this.setState({
+                      processing: false,
+                    });
                   });
-                });
-            } else {
-              const datoClient = new SiteClient(token);
-              datoClient.items.destroy(currentID)
-                .then(() => {
-                  const currentFieldValue = getFieldValue(fieldPath);
-                  currentFieldValue.splice(getFieldValue(fieldPath).indexOf(currentID), 1);
-
-                  const indexInData = data.roles.map(e => e.id).indexOf(currentID);
-                  data.roles.splice(indexInData, 1);
-
-                  setFieldValue(fieldPath, currentFieldValue);
-
-                  this.setState({
-                    processing: false,
-                  });
-                })
-                .catch((error) => {
-                  console.log(error);
-
-                  this.setState({
-                    processing: false,
-                  });
-                });
-            }
-          }
-          }
-        />
-        {rolesLink.artist.firstName}
-        {' '}
-        {rolesLink.artist.name}
+              }
+            }}
+          />
+          {rolesLink.artist.firstName} {rolesLink.artist.name}
+        </label>
       </li>
     );
   }
 
   getRoleRow(role, title, roles) {
-    const artistsRows = roles.map((rolesLink) => {
-      if (rolesLink.role.id === role.id) {
-        return this.getArtistsRoleRow(rolesLink);
-      }
-      return false;
-    }).filter(a => a);
+    const artistsRows = roles
+      .map((rolesLink) => {
+        if (rolesLink.role.id === role.id) {
+          return this.getArtistsRoleRow(rolesLink);
+        }
+        return false;
+      })
+      .filter((a) => a);
 
     if (artistsRows.length === 0) {
       return <></>;
@@ -148,7 +157,11 @@ export default class Main extends Component {
   getArtistsStaffRow(staffsLink) {
     const { processing, data } = this.state;
     const {
-      token, fieldPath, getFieldValue, setFieldValue, itemId,
+      token,
+      fieldPath,
+      getFieldValue,
+      setFieldValue,
+      itemId,
     } = this.props;
     let isChecked = false;
     let currentID;
@@ -174,11 +187,12 @@ export default class Main extends Component {
 
             if (!isChecked) {
               const datoClient = new SiteClient(token);
-              datoClient.items.create({
-                event: itemId,
-                staff: staffsLink.id,
-                itemType: '148537',
-              })
+              datoClient.items
+                .create({
+                  event: itemId,
+                  staff: staffsLink.id,
+                  itemType: '148537',
+                })
                 .then((item) => {
                   const currentFieldValue = getFieldValue(fieldPath);
                   currentFieldValue.push(item.id);
@@ -199,12 +213,18 @@ export default class Main extends Component {
                 });
             } else {
               const datoClient = new SiteClient(token);
-              datoClient.items.destroy(currentID)
+              datoClient.items
+                .destroy(currentID)
                 .then(() => {
                   const currentFieldValue = getFieldValue(fieldPath);
-                  currentFieldValue.splice(getFieldValue(fieldPath).indexOf(currentID), 1);
+                  currentFieldValue.splice(
+                    getFieldValue(fieldPath).indexOf(currentID),
+                    1,
+                  );
 
-                  const indexInData = data.staff.map(e => e.id).indexOf(currentID);
+                  const indexInData = data.staff
+                    .map((e) => e.id)
+                    .indexOf(currentID);
                   data.staff.splice(indexInData, 1);
 
                   setFieldValue(fieldPath, currentFieldValue);
@@ -221,23 +241,22 @@ export default class Main extends Component {
                   });
                 });
             }
-          }
-          }
+          }}
         />
-        {staffsLink.artist.firstName}
-        {' '}
-        {staffsLink.artist.name}
+        {staffsLink.artist.firstName} {staffsLink.artist.name}
       </li>
     );
   }
 
   getStaffRow(staff, title, staffs) {
-    const artistsRows = staffs.map((staffsLink) => {
-      if (staffsLink.staff.id === staff.id) {
-        return this.getArtistsStaffRow(staffsLink);
-      }
-      return false;
-    }).filter(a => a);
+    const artistsRows = staffs
+      .map((staffsLink) => {
+        if (staffsLink.staff.id === staff.id) {
+          return this.getArtistsStaffRow(staffsLink);
+        }
+        return false;
+      })
+      .filter((a) => a);
 
     if (artistsRows.length === 0) {
       return <></>;
@@ -307,7 +326,7 @@ export default class Main extends Component {
           `,
         }),
       })
-        .then(res => res.json())
+        .then((res) => res.json())
         .then((res) => {
           this.setState({
             loading: false,
@@ -406,7 +425,7 @@ export default class Main extends Component {
           `,
         }),
       })
-        .then(res => res.json())
+        .then((res) => res.json())
         .then((res) => {
           this.setState({
             loading: false,
@@ -441,7 +460,10 @@ export default class Main extends Component {
   }
 
   render() {
-    const { loading, data } = this.state;
+    const {
+      loading,
+      data: { production },
+    } = this.state;
     const { fieldPath } = this.props;
 
     if (loading) {
@@ -452,18 +474,16 @@ export default class Main extends Component {
       return (
         <div className="container">
           <ul>
-            {data.production.titles.map(title => (
+            {production.titles.map((title) => (
               <li key={`title_${title.id}`}>
                 <div>
-                  <h2>
-                    Titul:
-                    {' '}
-                    {title.title}
-                  </h2>
+                  <h2>Titul: {title.title}</h2>
                   <button type="button">Zaškrtnout vše</button>
                 </div>
                 <ul>
-                  {title.roles.map(role => this.getRoleRow(role, title, data.production.roles))}
+                  {title.roles.map((role) =>
+                    this.getRoleRow(role, title, production.roles),
+                  )}
                 </ul>
               </li>
             ))}
@@ -476,18 +496,16 @@ export default class Main extends Component {
       return (
         <div className="container">
           <ul>
-            {data.production.titles.map(title => (
+            {production.titles.map((title) => (
               <li key={`title_${title.id}`}>
                 <div>
-                  <h2>
-                    Titul:
-                    {' '}
-                    {title.title}
-                  </h2>
+                  <h2>Titul: {title.title}</h2>
                   <button type="button">Zaškrtnout vše</button>
                 </div>
                 <ul>
-                  {title.staff.map(staff => this.getStaffRow(staff, title, data.production.staff))}
+                  {title.staff.map((staff) =>
+                    this.getStaffRow(staff, title, production.staff),
+                  )}
                 </ul>
               </li>
             ))}
@@ -499,3 +517,13 @@ export default class Main extends Component {
     return <span>Bad field!</span>;
   }
 }
+
+Main.propTypes = {
+  token: PropTypes.string,
+  itemId: PropTypes.string,
+  fieldPath: PropTypes.string,
+  setFieldValue: PropTypes.func,
+  getFieldValue: PropTypes.func,
+};
+
+export default Main;
