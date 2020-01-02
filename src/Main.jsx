@@ -460,7 +460,7 @@ export default class Main extends Component {
                     {' '}
                     {title.title}
                   </h2>
-                  <button>Zaškrtnout vše</button>
+                  <button type="button">Zaškrtnout vše</button>
                 </div>
                 <ul>
                   {title.roles.map(role => this.getRoleRow(role, title, data.production.roles))}
