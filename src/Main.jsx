@@ -70,7 +70,7 @@ class Main extends Component {
     );
   }
 
-  getRoleRow(role, title, roles) {
+  getRoleRow(role, roles) {
     const artistsRows = roles
       .map((rolesLink) => {
         if (rolesLink.role.id === role.id) {
@@ -85,7 +85,7 @@ class Main extends Component {
     }
 
     return (
-      <li key={`title_${title.id}_role${role.id}`}>
+      <li key={`title_role${role.id}`}>
         <h3>{role.name}</h3>
         <ul>{artistsRows}</ul>
       </li>
@@ -567,7 +567,7 @@ class Main extends Component {
                 </div>
                 <ul>
                   {title.roles.map((role) =>
-                    this.getRoleRow(role, title, data.production.roles),
+                    this.getRoleRow(role, data.production.roles),
                   )}
                 </ul>
               </li>
