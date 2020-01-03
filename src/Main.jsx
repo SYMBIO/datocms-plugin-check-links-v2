@@ -201,10 +201,10 @@ class Main extends Component {
     const indexInData = data.roles.map((e) => e.id).indexOf(currentID);
     data.roles.splice(indexInData, 1);
 
+    setFieldValue(fieldPath, currentFieldValue);
+
     const datoClient = new SiteClient(token);
     await datoClient.items.destroy(currentID);
-
-    setFieldValue(fieldPath, currentFieldValue);
 
     this.setState({
       processing: false,
@@ -383,8 +383,6 @@ class Main extends Component {
 
     this.setState({ processing: true });
 
-    const datoClient = new SiteClient(token);
-    await datoClient.items.destroy(currentID);
     const currentFieldValue = getFieldValue(fieldPath);
     currentFieldValue.splice(getFieldValue(fieldPath).indexOf(currentID), 1);
 
@@ -392,6 +390,9 @@ class Main extends Component {
     data.staff.splice(indexInData, 1);
 
     setFieldValue(fieldPath, currentFieldValue);
+
+    const datoClient = new SiteClient(token);
+    await datoClient.items.destroy(currentID);
 
     this.setState({
       processing: false,
