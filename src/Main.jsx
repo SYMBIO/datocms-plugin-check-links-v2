@@ -195,16 +195,14 @@ class Main extends Component {
 
     this.setState({ processing: true });
 
-    const datoClient = new SiteClient(token);
-    await datoClient.items.destroy(currentID);
     const currentFieldValue = getFieldValue(fieldPath);
-    console.log(currentFieldValue);
-    currentFieldValue.splice(getFieldValue(fieldPath).indexOf(currentID), 1);
+    currentFieldValue.splice(currentFieldValue.indexOf(currentID), 1);
 
     const indexInData = data.roles.map((e) => e.id).indexOf(currentID);
     data.roles.splice(indexInData, 1);
 
-    console.log(currentFieldValue);
+    const datoClient = new SiteClient(token);
+    await datoClient.items.destroy(currentID);
 
     setFieldValue(fieldPath, currentFieldValue);
 
