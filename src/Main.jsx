@@ -60,7 +60,7 @@ class Main extends Component {
               if (exists) {
                 this.removeRole(rolesLink, currentID);
               } else {
-                this.addStaffs([rolesLink]);
+                this.addRoles([rolesLink]);
               }
             }}
           />
