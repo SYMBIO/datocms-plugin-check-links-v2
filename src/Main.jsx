@@ -203,6 +203,8 @@ class Main extends Component {
     const indexInData = data.roles.map((e) => e.id).indexOf(currentID);
     data.roles.splice(indexInData, 1);
 
+    console.log(currentFieldValue);
+
     setFieldValue(fieldPath, currentFieldValue);
 
     this.setState({
