@@ -32,7 +32,7 @@ class Main extends Component {
     }
 
     if (fieldPath === 'staff') {
-      this.updateStaffData();
+      this.loadStaffData();
     }
   }
 
@@ -154,101 +154,7 @@ class Main extends Component {
     );
   }
 
-  getArtistsStaffRow(staffsLink) {
-    const { processing, data } = this.state;
-    const {
-      token,
-      fieldPath,
-      getFieldValue,
-      setFieldValue,
-      itemId,
-    } = this.props;
-    let isChecked = false;
-    let currentID;
-
-    data.staff.map((selectedStaff) => {
-      if (selectedStaff.staff.id === staffsLink.id) {
-        isChecked = true;
-        currentID = selectedStaff.id;
-      }
-      return null;
-    });
-
-    return (
-      <li key={`artist_${staffsLink.id}`}>
-        <input
-          type="checkbox"
-          defaultChecked={isChecked}
-          disabled={processing}
-          onClick={() => {
-            this.setState({
-              processing: true,
-            });
-
-            if (!isChecked) {
-              const datoClient = new SiteClient(token);
-              datoClient.items
-                .create({
-                  event: itemId,
-                  staff: staffsLink.id,
-                  itemType: '148537',
-                })
-                .then((item) => {
-                  const currentFieldValue = getFieldValue(fieldPath);
-                  currentFieldValue.push(item.id);
-                  setFieldValue(fieldPath, currentFieldValue);
-
-                  this.updateStaffData(true, item, staffsLink);
-
-                  this.setState({
-                    processing: false,
-                  });
-                })
-                .catch((error) => {
-                  console.log(error);
-
-                  this.setState({
-                    processing: false,
-                  });
-                });
-            } else {
-              const datoClient = new SiteClient(token);
-              datoClient.items
-                .destroy(currentID)
-                .then(() => {
-                  const currentFieldValue = getFieldValue(fieldPath);
-                  currentFieldValue.splice(
-                    getFieldValue(fieldPath).indexOf(currentID),
-                    1,
-                  );
-
-                  const indexInData = data.staff
-                    .map((e) => e.id)
-                    .indexOf(currentID);
-                  data.staff.splice(indexInData, 1);
-
-                  setFieldValue(fieldPath, currentFieldValue);
-
-                  this.setState({
-                    processing: false,
-                  });
-                })
-                .catch((error) => {
-                  console.log(error);
-
-                  this.setState({
-                    processing: false,
-                  });
-                });
-            }
-          }}
-        />
-        {staffsLink.artist.firstName} {staffsLink.artist.name}
-      </li>
-    );
-  }
-
-  getStaffRow(staff, title, staffs) {
+  getStaffRow(staff, staffs) {
     const artistsRows = staffs
       .map((staffsLink) => {
         if (staffsLink.staff.id === staff.id) {
@@ -263,11 +169,139 @@ class Main extends Component {
     }
 
     return (
-      <li key={`title_${title.id}_staff${staff.id}`}>
+      <li key={`title_staff${staff.id}`}>
         <h3>{staff.field.title}</h3>
         <ul>{artistsRows}</ul>
       </li>
     );
+  }
+
+  getArtistsStaffRow(staffsLink) {
+    const { processing, data } = this.state;
+    let exists = false;
+    let currentID;
+
+    data.staff.forEach((selectedStaff) => {
+      if (selectedStaff.staff.id === staffsLink.id) {
+        exists = true;
+        currentID = selectedStaff.id;
+      }
+    });
+
+    return (
+      <li key={`artist_${staffsLink.id}`}>
+        <input
+          type="checkbox"
+          checked={exists}
+          disabled={processing}
+          onChange={() => {
+            if (exists) {
+              this.removeStaff(staffsLink, currentID);
+            } else {
+              this.addStaffs([staffsLink]);
+            }
+          }}
+        />
+        {staffsLink.artist.firstName} {staffsLink.artist.name}
+      </li>
+    );
+  }
+
+  async addStaffs(staffsLinks) {
+    const {
+      token,
+      fieldPath,
+      getFieldValue,
+      setFieldValue,
+      itemId,
+    } = this.props;
+
+    this.setState({ processing: true });
+
+    const datoClient = new SiteClient(token);
+    const promises = [];
+    staffsLinks.forEach((s) => {
+      promises.push(
+        datoClient.items.create({
+          event: itemId,
+          staff: s.id,
+          itemType: '148537',
+        }),
+      );
+    });
+
+    try {
+      const items = await Promise.all(promises);
+      const currentFieldValue = getFieldValue(fieldPath);
+      items.forEach((item) => {
+        currentFieldValue.push(item.id);
+      });
+      setFieldValue(fieldPath, currentFieldValue);
+
+      const newData = this.updateStaffData(items, staffsLinks);
+
+      this.setState({
+        processing: false,
+        data: newData,
+      });
+    } catch (error) {
+      console.log(error);
+      this.setState({ processing: false });
+    }
+  }
+
+  async removeStaff(staffsLink, currentID) {
+    const { token, fieldPath, getFieldValue, setFieldValue } = this.props;
+
+    const { data } = this.state;
+
+    this.setState({ processing: true });
+
+    const datoClient = new SiteClient(token);
+    await datoClient.items.destroy(currentID);
+    const currentFieldValue = getFieldValue(fieldPath);
+    currentFieldValue.splice(getFieldValue(fieldPath).indexOf(currentID), 1);
+
+    const indexInData = data.staff.map((e) => e.id).indexOf(currentID);
+    data.staff.splice(indexInData, 1);
+
+    setFieldValue(fieldPath, currentFieldValue);
+
+    this.setState({
+      processing: false,
+    });
+  }
+
+  removeStaffs() {
+    const { token, fieldPath, setFieldValue } = this.props;
+    const { data } = this.state;
+    const datoClient = new SiteClient(token);
+
+    this.setState({ processing: true });
+
+    const newData = { ...data };
+
+    setFieldValue(fieldPath, []);
+
+    const promises = [];
+    newData.staff.forEach((s) => {
+      promises.push(datoClient.items.destroy(s.id));
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        newData.staff = [];
+
+        this.setState({
+          data: newData,
+          processing: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          processing: false,
+        });
+      });
   }
 
   updateRolesData(cache, item, rolesLink) {
@@ -360,24 +394,22 @@ class Main extends Component {
     }
   }
 
-  updateStaffData(cache, item, staffsLink) {
+  loadStaffData() {
     const { token, itemId } = this.props;
-    const { data } = this.state;
 
     this.setState({
       loading: true,
     });
 
-    if (!cache) {
-      fetch('https://graphql.datocms.com/preview', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          query: `{
+    fetch('https://graphql.datocms.com/preview', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `{
             event(filter: {id: {eq: "${itemId}"}}) {
               production {
                 id
@@ -423,47 +455,46 @@ class Main extends Component {
             }
           }
           `,
-        }),
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          this.setState({
-            loading: false,
-            data: res.data.event,
-          });
-        })
-        .catch((error) => {
-          this.setState({
-            loading: false,
-          });
-          console.log(error);
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        this.setState({
+          loading: false,
+          data: res.data.event,
         });
-    } else {
+      })
+      .catch((error) => {
+        this.setState({
+          loading: false,
+        });
+        console.log(error);
+      });
+  }
+
+  updateStaffData(items, staffsLinks) {
+    const { data } = this.state;
+
+    const newData = { ...data };
+    items.forEach((item, i) => {
       const newRecord = {
         id: item.id,
         staff: {
           id: item.staff,
           staff: {
-            id: staffsLink.staff.id,
-            field: staffsLink.staff.field,
+            id: staffsLinks[i].staff.id,
+            field: staffsLinks[i].staff.field,
           },
         },
       };
-      const originalData = data;
-      originalData.staff.push(newRecord);
+      newData.staff.push(newRecord);
+    });
 
-      this.setState({
-        loading: false,
-        data: originalData,
-      });
-    }
+    return newData;
   }
 
   render() {
-    const {
-      loading,
-      data: { production },
-    } = this.state;
+    const { loading, data } = this.state;
     const { fieldPath } = this.props;
 
     if (loading) {
@@ -474,7 +505,7 @@ class Main extends Component {
       return (
         <div className="container">
           <ul>
-            {production.titles.map((title) => (
+            {data.production.titles.map((title) => (
               <li key={`title_${title.id}`}>
                 <div>
                   <h2>Titul: {title.title}</h2>
@@ -482,7 +513,8 @@ class Main extends Component {
                   <button type="button">Odškrtnout vše</button>
                 </div>
                 <ul>
-                  {title.roles.map((role) => this.getRoleRow(role, title, production.roles),
+                  {title.roles.map((role) =>
+                    this.getRoleRow(role, title, data.production.roles),
                   )}
                 </ul>
               </li>
@@ -496,15 +528,34 @@ class Main extends Component {
       return (
         <div className="container">
           <ul>
-            {production.titles.map((title) => (
+            {data.production.titles.map((title) => (
               <li key={`title_${title.id}`}>
                 <div>
                   <h2>Titul: {title.title}</h2>
-                  <button type="button">Zaškrtnout vše</button>
-                  <button type="button">Odškrtnout vše</button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      this.addStaffs(
+                        data.production.staff.filter(
+                          (s) => !data.staff.find((ss) => ss.staff.id === s.id),
+                        ),
+                      );
+                    }}
+                  >
+                    Zaškrtnout vše
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      this.removeStaffs();
+                    }}
+                  >
+                    Odškrtnout vše
+                  </button>
                 </div>
                 <ul>
-                  {title.staff.map((staff) => this.getStaffRow(staff, title, production.staff),
+                  {title.staff.map((staff) =>
+                    this.getStaffRow(staff, data.production.staff),
                   )}
                 </ul>
               </li>
