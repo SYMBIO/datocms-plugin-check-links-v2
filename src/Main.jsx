@@ -198,6 +198,7 @@ class Main extends Component {
     const datoClient = new SiteClient(token);
     await datoClient.items.destroy(currentID);
     const currentFieldValue = getFieldValue(fieldPath);
+    console.log(currentFieldValue);
     currentFieldValue.splice(getFieldValue(fieldPath).indexOf(currentID), 1);
 
     const indexInData = data.roles.map((e) => e.id).indexOf(currentID);
