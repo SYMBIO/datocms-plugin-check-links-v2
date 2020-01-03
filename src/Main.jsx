@@ -28,7 +28,7 @@ class Main extends Component {
     const { fieldPath } = this.props;
 
     if (fieldPath === 'roles') {
-      this.updateRolesData();
+      this.loadRolesData();
     }
 
     if (fieldPath === 'staff') {
@@ -38,19 +38,12 @@ class Main extends Component {
 
   getArtistsRoleRow(rolesLink) {
     const { processing, data } = this.state;
-    const {
-      token,
-      fieldPath,
-      getFieldValue,
-      setFieldValue,
-      itemId,
-    } = this.props;
-    let isChecked = false;
+    let exists = false;
     let currentID;
 
     data.roles.map((selectedRole) => {
       if (selectedRole.role.id === rolesLink.id) {
-        isChecked = true;
+        exists = true;
         currentID = selectedRole.id;
       }
       return null;
@@ -61,68 +54,13 @@ class Main extends Component {
         <label>
           <input
             type="checkbox"
-            defaultChecked={isChecked}
+            checked={exists}
             disabled={processing}
-            onClick={() => {
-              this.setState({
-                processing: true,
-              });
-
-              if (!isChecked) {
-                const datoClient = new SiteClient(token);
-                datoClient.items
-                  .create({
-                    event: itemId,
-                    role: rolesLink.id,
-                    itemType: '137165',
-                  })
-                  .then((item) => {
-                    const currentFieldValue = getFieldValue(fieldPath);
-                    currentFieldValue.push(item.id);
-                    setFieldValue(fieldPath, currentFieldValue);
-
-                    this.updateRolesData(true, item, rolesLink);
-
-                    this.setState({
-                      processing: false,
-                    });
-                  })
-                  .catch((error) => {
-                    console.log(error);
-
-                    this.setState({
-                      processing: false,
-                    });
-                  });
+            onChange={() => {
+              if (exists) {
+                this.removeRole(rolesLink, currentID);
               } else {
-                const datoClient = new SiteClient(token);
-                datoClient.items
-                  .destroy(currentID)
-                  .then(() => {
-                    const currentFieldValue = getFieldValue(fieldPath);
-                    currentFieldValue.splice(
-                      getFieldValue(fieldPath).indexOf(currentID),
-                      1,
-                    );
-
-                    const indexInData = data.roles
-                      .map((e) => e.id)
-                      .indexOf(currentID);
-                    data.roles.splice(indexInData, 1);
-
-                    setFieldValue(fieldPath, currentFieldValue);
-
-                    this.setState({
-                      processing: false,
-                    });
-                  })
-                  .catch((error) => {
-                    console.log(error);
-
-                    this.setState({
-                      processing: false,
-                    });
-                  });
+                this.addStaffs([rolesLink]);
               }
             }}
           />
@@ -205,6 +143,193 @@ class Main extends Component {
         {staffsLink.artist.firstName} {staffsLink.artist.name}
       </li>
     );
+  }
+
+  async addRoles(rolesLinks) {
+    const {
+      token,
+      fieldPath,
+      getFieldValue,
+      setFieldValue,
+      itemId,
+    } = this.props;
+
+    this.setState({ processing: true });
+
+    const datoClient = new SiteClient(token);
+    const promises = [];
+    rolesLinks.forEach((r) => {
+      promises.push(
+        datoClient.items.create({
+          event: itemId,
+          role: r.id,
+          itemType: '137165',
+        }),
+      );
+    });
+
+    try {
+      const items = await Promise.all(promises);
+      const currentFieldValue = getFieldValue(fieldPath);
+      items.forEach((item) => {
+        currentFieldValue.push(item.id);
+      });
+      setFieldValue(fieldPath, currentFieldValue);
+
+      const newData = this.updateRolesData(items, rolesLinks);
+
+      this.setState({
+        processing: false,
+        data: newData,
+      });
+    } catch (error) {
+      console.log(error);
+      this.setState({ processing: false });
+    }
+  }
+
+  async removeRole(rolesLink, currentID) {
+    const { token, fieldPath, getFieldValue, setFieldValue } = this.props;
+
+    const { data } = this.state;
+
+    this.setState({ processing: true });
+
+    const datoClient = new SiteClient(token);
+    await datoClient.items.destroy(currentID);
+    const currentFieldValue = getFieldValue(fieldPath);
+    currentFieldValue.splice(getFieldValue(fieldPath).indexOf(currentID), 1);
+
+    const indexInData = data.roles.map((e) => e.id).indexOf(currentID);
+    data.roles.splice(indexInData, 1);
+
+    setFieldValue(fieldPath, currentFieldValue);
+
+    this.setState({
+      processing: false,
+    });
+  }
+
+  removeRoles() {
+    const { token, fieldPath, setFieldValue } = this.props;
+    const { data } = this.state;
+    const datoClient = new SiteClient(token);
+
+    this.setState({ processing: true });
+
+    const newData = { ...data };
+
+    setFieldValue(fieldPath, []);
+
+    const promises = [];
+    newData.roles.forEach((r) => {
+      promises.push(datoClient.items.destroy(r.id));
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        newData.roles = [];
+
+        this.setState({
+          data: newData,
+          processing: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          processing: false,
+        });
+      });
+  }
+
+  loadRolesData() {
+    const { token, itemId } = this.props;
+
+    this.setState({
+      loading: true,
+    });
+
+    fetch('https://graphql.datocms.com/preview', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `{
+          event(filter: {id: {eq: "${itemId}"}}) {
+            production {
+              id,
+              titles {
+                id,
+                title
+                roles {
+                  id, 
+                  name
+                }
+              }
+              roles {
+                id,
+                role {
+                  id,
+                  name
+                },
+                artist{
+                  firstName
+                  name
+                }
+              }
+            },
+            roles {
+              id,
+              role {
+                id,
+                role {
+                  id,
+                  name
+                }
+              }
+            }
+          }
+        }
+        `,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        this.setState({
+          loading: false,
+          data: res.data.event,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          loading: false,
+        });
+        console.log(error);
+      });
+  }
+
+  updateRolesData(items, rolesLinks) {
+    const { data } = this.state;
+
+    const newData = { ...data };
+    items.forEach((item, i) => {
+      const newRecord = {
+        id: item.id,
+        role: {
+          id: item.role,
+          role: {
+            id: rolesLinks[i].role.id,
+            name: rolesLinks[i].role.name,
+          },
+        },
+      };
+      newData.roles.push(newRecord);
+    });
+
+    return newData;
   }
 
   async addStaffs(staffsLinks) {
@@ -304,96 +429,6 @@ class Main extends Component {
       });
   }
 
-  updateRolesData(cache, item, rolesLink) {
-    const { token, itemId } = this.props;
-    const { data } = this.state;
-
-    this.setState({
-      loading: true,
-    });
-
-    if (!cache) {
-      fetch('https://graphql.datocms.com/preview', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          query: `{
-            event(filter: {id: {eq: "${itemId}"}}) {
-              production {
-                id,
-                titles {
-                  id,
-                  title
-                  roles {
-                    id, 
-                    name
-                  }
-                }
-                roles {
-                  id,
-                  role {
-                    id,
-                    name
-                  },
-                  artist{
-                    firstName
-                    name
-                  }
-                }
-              },
-              roles {
-                id,
-                role {
-                  id,
-                  role {
-                    id,
-                    name
-                  }
-                }
-              }
-            }
-          }
-          `,
-        }),
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          this.setState({
-            loading: false,
-            data: res.data.event,
-          });
-        })
-        .catch((error) => {
-          this.setState({
-            loading: false,
-          });
-          console.log(error);
-        });
-    } else {
-      const newRecord = {
-        id: item.id,
-        role: {
-          id: item.role,
-          role: {
-            id: rolesLink.role.id,
-            name: rolesLink.role.name,
-          },
-        },
-      };
-      const originalData = data;
-      originalData.roles.push(newRecord);
-
-      this.setState({
-        loading: false,
-        data: originalData,
-      });
-    }
-  }
-
   loadStaffData() {
     const { token, itemId } = this.props;
 
@@ -410,50 +445,50 @@ class Main extends Component {
       },
       body: JSON.stringify({
         query: `{
-            event(filter: {id: {eq: "${itemId}"}}) {
-              production {
+          event(filter: {id: {eq: "${itemId}"}}) {
+            production {
+              id
+              titles {
                 id
-                titles {
-                  id
-                  title
-                  staff {
-                    id 
-                    field {
-                      id
-                      title
-                    }
-                  }
-                }
+                title
                 staff {
-                  id
-                  staff {
+                  id 
+                  field {
                     id
-                    field {
-                      id
-                      title
-                    }
-                  },
-                  artist{
-                    firstName
-                    name
+                    title
                   }
                 }
-              },
+              }
               staff {
                 id
                 staff {
                   id
-                  staff {
+                  field {
                     id
-                    field {
-                      id
-                      title
-                    }
+                    title
+                  }
+                },
+                artist{
+                  firstName
+                  name
+                }
+              }
+            },
+            staff {
+              id
+              staff {
+                id
+                staff {
+                  id
+                  field {
+                    id
+                    title
                   }
                 }
               }
             }
           }
+        }
           `,
       }),
     })
@@ -509,8 +544,26 @@ class Main extends Component {
               <li key={`title_${title.id}`}>
                 <div>
                   <h2>Titul: {title.title}</h2>
-                  <button type="button">Zaškrtnout vše</button>
-                  <button type="button">Odškrtnout vše</button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      this.addRoles(
+                        data.production.roles.filter(
+                          (r) => !data.roles.find((rr) => rr.role.id === r.id),
+                        ),
+                      );
+                    }}
+                  >
+                    Zaškrtnout vše
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      this.removeRoles();
+                    }}
+                  >
+                    Odškrtnout vše
+                  </button>
                 </div>
                 <ul>
                   {title.roles.map((role) =>
