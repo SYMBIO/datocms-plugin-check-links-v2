@@ -40,6 +40,8 @@
       "links"
     ],
     "parameters": {
+      "global": [],
+      "instance": []
     }
   },
   "prettier": {

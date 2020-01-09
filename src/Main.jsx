@@ -25,11 +25,11 @@ class Main extends Component {
   componentDidMount() {
     const { fieldPath } = this.props;
 
-    if (fieldPath === 'roles') {
+    if (fieldPath.substr(0, 5) === 'roles') {
       this.loadRolesData();
     }
 
-    if (fieldPath === 'staff') {
+    if (fieldPath.substr(0, 5) === 'staff') {
       this.loadStaffData();
     }
   }
@@ -276,7 +276,7 @@ class Main extends Component {
       );
     }
 
-    if (fieldPath === 'staff') {
+    if (fieldPath.substr(0, 5) === 'staff') {
       return (
         <div className="container">
           <ul>
