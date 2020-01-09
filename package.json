@@ -31,7 +31,7 @@
   "author": "SYMBIO <dev@symbio.agency>",
   "license": "ISC",
   "datoCmsPlugin": {
-    "title": "Check Links",
+    "title": "Check Links V2",
     "previewImage": "docs/preview.gif",
     "coverImage": "docs/cover.png",
     "entryPoint": "dist/index.html",
@@ -40,24 +40,6 @@
       "links"
     ],
     "parameters": {
-      "global": [
-        {
-          "id": "datoCmsApiToken",
-          "label": "DatoCMS API Token",
-          "type": "string",
-          "required": true,
-          "hint": "The DatoCMS API full-access token, <a href=\"/admin/access_tokens\">get it here</a>"
-        }
-      ],
-      "instance": [
-        {
-          "id": "groupField",
-          "label": "Field to group by",
-          "type": "string",
-          "required": true,
-          "hint": "Insert api name of the field used for grouping"
-        }
-      ]
     }
   },
   "prettier": {
