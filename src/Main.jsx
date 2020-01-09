@@ -1,26 +1,24 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { SiteClient } from 'datocms-client';
 
 import connectToDatoCms from './connectToDatoCms';
 import './style.css';
 
-@connectToDatoCms((plugin) => ({
+@connectToDatoCms(plugin => ({
   token: plugin.parameters.global.datoCmsApiToken,
   itemId: plugin.itemId,
   fieldPath: plugin.fieldPath,
   setFieldValue: plugin.setFieldValue,
   getFieldValue: plugin.getFieldValue,
+  productionId: plugin.getFieldValue('production'),
 }))
 class Main extends Component {
-  constructor() {
+  constructor(props) {
     super();
     this.state = {
       loading: true,
-      processing: false,
-      data: {
-        production: null,
-      },
+      data: {},
+      selected: props.getFieldValue(props.fieldPath),
     };
   }
 
@@ -36,49 +34,42 @@ class Main extends Component {
     }
   }
 
-  getArtistsRoleRow(rolesLink) {
-    const { processing, data } = this.state;
-    let exists = false;
-    let currentID;
+  componentDidUpdate(prevProps, prevState) {
+    const { selected } = this.state;
+    if (selected !== prevState.selected) {
+      const { setFieldValue, fieldPath } = this.props;
+      setFieldValue(fieldPath, selected);
+    }
+  }
 
-    data.roles.map((selectedRole) => {
-      if (selectedRole.role.id === rolesLink.id) {
-        exists = true;
-        currentID = selectedRole.id;
-      }
-      return null;
-    });
+  getArtistsRoleRow(role) {
+    const { selected } = this.state;
 
     return (
-      <li key={`artist_${rolesLink.id}`}>
+      <li key={`artist_${role.id}`}>
         <label>
           <input
             type="checkbox"
-            checked={exists}
-            disabled={processing}
+            checked={selected.indexOf(role.id) !== -1}
             onChange={() => {
-              if (exists) {
-                this.removeRole(rolesLink, currentID);
+              if (selected.indexOf(role.id) !== -1) {
+                const newSelected = selected.filter(r => r !== role.id);
+                this.setState({ selected: newSelected });
               } else {
-                this.addRoles([rolesLink]);
+                this.setState({ selected: [...selected, role.id] });
               }
             }}
           />
-          {rolesLink.artist.firstName} {rolesLink.artist.name}
+          {role.artist.firstName} {role.artist.name}
         </label>
       </li>
     );
   }
 
-  getRoleRow(role, roles) {
-    const artistsRows = roles
-      .map((rolesLink) => {
-        if (rolesLink.role.id === role.id) {
-          return this.getArtistsRoleRow(rolesLink);
-        }
-        return false;
-      })
-      .filter((a) => a);
+  getRoleRow(role) {
+    const { roles } = this.state;
+    const productionRoles = roles.filter(r => r.role.id === role.id);
+    const artistsRows = productionRoles.map(r => this.getArtistsRoleRow(r));
 
     if (artistsRows.length === 0) {
       return <></>;
@@ -92,159 +83,49 @@ class Main extends Component {
     );
   }
 
-  getStaffRow(staff, staffs) {
-    const artistsRows = staffs
-      .map((staffsLink) => {
-        if (staffsLink.staff.id === staff.id) {
-          return this.getArtistsStaffRow(staffsLink);
-        }
-        return false;
-      })
-      .filter((a) => a);
+  getArtistsStaffRow(staff) {
+    const { selected } = this.state;
+
+    return (
+      <li key={`artist_${staff.id}`}>
+        <label>
+          <input
+            type="checkbox"
+            checked={selected.indexOf(staff.id) !== -1}
+            onChange={() => {
+              if (selected.indexOf(staff.id) !== -1) {
+                const newSelected = selected.filter(s => s !== staff.id);
+                this.setState({ selected: newSelected });
+              } else {
+                this.setState({ selected: [...selected, staff.id] });
+              }
+            }}
+          />
+          {staff.artist.firstName} {staff.artist.name}
+        </label>
+      </li>
+    );
+  }
+
+  getStaffRow(staf) {
+    const { staff } = this.state;
+    const productionStaff = staff.filter(s => s.staff.id === staf.id);
+    const artistsRows = productionStaff.map(s => this.getArtistsStaffRow(s));
 
     if (artistsRows.length === 0) {
       return <></>;
     }
 
     return (
-      <li key={`title_staff${staff.id}`}>
-        <h3>{staff.field.title}</h3>
+      <li key={`title_role${staf.id}`}>
+        <h3>{staf.field.title}</h3>
         <ul>{artistsRows}</ul>
       </li>
     );
   }
 
-  getArtistsStaffRow(staffsLink) {
-    const { processing, data } = this.state;
-    let exists = false;
-    let currentID;
-
-    data.staff.forEach((selectedStaff) => {
-      if (selectedStaff.staff.id === staffsLink.id) {
-        exists = true;
-        currentID = selectedStaff.id;
-      }
-    });
-
-    return (
-      <li key={`artist_${staffsLink.id}`}>
-        <input
-          type="checkbox"
-          checked={exists}
-          disabled={processing}
-          onChange={() => {
-            if (exists) {
-              this.removeStaff(staffsLink, currentID);
-            } else {
-              this.addStaffs([staffsLink]);
-            }
-          }}
-        />
-        {staffsLink.artist.firstName} {staffsLink.artist.name}
-      </li>
-    );
-  }
-
-  async addRoles(rolesLinks) {
-    const {
-      token,
-      fieldPath,
-      getFieldValue,
-      setFieldValue,
-      itemId,
-    } = this.props;
-
-    this.setState({ processing: true });
-
-    const datoClient = new SiteClient(token);
-    const promises = [];
-    rolesLinks.forEach((r) => {
-      promises.push(
-        datoClient.items.create({
-          event: itemId,
-          role: r.id,
-          itemType: '137165',
-        }),
-      );
-    });
-
-    try {
-      const items = await Promise.all(promises);
-      const currentFieldValue = getFieldValue(fieldPath);
-      items.forEach((item) => {
-        currentFieldValue.push(item.id);
-      });
-      setFieldValue(fieldPath, currentFieldValue);
-
-      const newData = this.updateRolesData(items, rolesLinks);
-
-      this.setState({
-        processing: false,
-        data: newData,
-      });
-    } catch (error) {
-      console.log(error);
-      this.setState({ processing: false });
-    }
-  }
-
-  async removeRole(rolesLink, currentID) {
-    const { token, fieldPath, getFieldValue, setFieldValue } = this.props;
-
-    const { data } = this.state;
-
-    this.setState({ processing: true });
-
-    const currentFieldValue = getFieldValue(fieldPath);
-    currentFieldValue.splice(currentFieldValue.indexOf(currentID), 1);
-
-    const indexInData = data.roles.map((e) => e.id).indexOf(currentID);
-    data.roles.splice(indexInData, 1);
-
-    setFieldValue(fieldPath, currentFieldValue);
-
-    const datoClient = new SiteClient(token);
-    await datoClient.items.destroy(currentID);
-
-    this.setState({
-      processing: false,
-    });
-  }
-
-  removeRoles() {
-    const { token, fieldPath, setFieldValue } = this.props;
-    const { data } = this.state;
-    const datoClient = new SiteClient(token);
-
-    this.setState({ processing: true });
-
-    const newData = { ...data };
-
-    setFieldValue(fieldPath, []);
-
-    const promises = [];
-    newData.roles.forEach((r) => {
-      promises.push(datoClient.items.destroy(r.id));
-    });
-
-    Promise.all(promises)
-      .then(() => {
-        newData.roles = [];
-
-        this.setState({
-          data: newData,
-          processing: false,
-        });
-      })
-      .catch(() => {
-        this.setState({
-          processing: false,
-        });
-      });
-  }
-
   loadRolesData() {
-    const { token, itemId } = this.props;
+    const { token, productionId } = this.props;
 
     this.setState({
       loading: true,
@@ -259,37 +140,23 @@ class Main extends Component {
       },
       body: JSON.stringify({
         query: `{
-          event(filter: {id: {eq: "${itemId}"}}) {
-            production {
-              id,
-              titles {
-                id,
-                title
-                roles {
-                  id, 
-                  name
-                }
-              }
+          production(filter: {id: {eq: "${productionId}"}}) {
+            titles {
+              id
+              title
               roles {
-                id,
-                role {
-                  id,
-                  name
-                },
-                artist{
-                  firstName
-                  name
-                }
+                id
+                name
               }
-            },
+            }
             roles {
-              id,
+              id
               role {
-                id,
-                role {
-                  id,
-                  name
-                }
+                id
+              }
+              artist{
+                firstName
+                name
               }
             }
           }
@@ -297,14 +164,14 @@ class Main extends Component {
         `,
       }),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         this.setState({
           loading: false,
-          data: res.data.event,
+          data: res.data.production,
         });
       })
-      .catch((error) => {
+      .catch(error => {
         this.setState({
           loading: false,
         });
@@ -312,127 +179,8 @@ class Main extends Component {
       });
   }
 
-  updateRolesData(items, rolesLinks) {
-    const { data } = this.state;
-
-    const newData = { ...data };
-    items.forEach((item, i) => {
-      const newRecord = {
-        id: item.id,
-        role: {
-          id: item.role,
-          role: {
-            id: rolesLinks[i].role.id,
-            name: rolesLinks[i].role.name,
-          },
-        },
-      };
-      newData.roles.push(newRecord);
-    });
-
-    return newData;
-  }
-
-  async addStaffs(staffsLinks) {
-    const {
-      token,
-      fieldPath,
-      getFieldValue,
-      setFieldValue,
-      itemId,
-    } = this.props;
-
-    this.setState({ processing: true });
-
-    const datoClient = new SiteClient(token);
-    const promises = [];
-    staffsLinks.forEach((s) => {
-      promises.push(
-        datoClient.items.create({
-          event: itemId,
-          staff: s.id,
-          itemType: '148537',
-        }),
-      );
-    });
-
-    try {
-      const items = await Promise.all(promises);
-      const currentFieldValue = getFieldValue(fieldPath);
-      items.forEach((item) => {
-        currentFieldValue.push(item.id);
-      });
-      setFieldValue(fieldPath, currentFieldValue);
-
-      const newData = this.updateStaffData(items, staffsLinks);
-
-      this.setState({
-        processing: false,
-        data: newData,
-      });
-    } catch (error) {
-      console.log(error);
-      this.setState({ processing: false });
-    }
-  }
-
-  async removeStaff(staffsLink, currentID) {
-    const { token, fieldPath, getFieldValue, setFieldValue } = this.props;
-
-    const { data } = this.state;
-
-    this.setState({ processing: true });
-
-    const currentFieldValue = getFieldValue(fieldPath);
-    currentFieldValue.splice(getFieldValue(fieldPath).indexOf(currentID), 1);
-
-    const indexInData = data.staff.map((e) => e.id).indexOf(currentID);
-    data.staff.splice(indexInData, 1);
-
-    setFieldValue(fieldPath, currentFieldValue);
-
-    const datoClient = new SiteClient(token);
-    await datoClient.items.destroy(currentID);
-
-    this.setState({
-      processing: false,
-    });
-  }
-
-  removeStaffs() {
-    const { token, fieldPath, setFieldValue } = this.props;
-    const { data } = this.state;
-    const datoClient = new SiteClient(token);
-
-    this.setState({ processing: true });
-
-    const newData = { ...data };
-
-    setFieldValue(fieldPath, []);
-
-    const promises = [];
-    newData.staff.forEach((s) => {
-      promises.push(datoClient.items.destroy(s.id));
-    });
-
-    Promise.all(promises)
-      .then(() => {
-        newData.staff = [];
-
-        this.setState({
-          data: newData,
-          processing: false,
-        });
-      })
-      .catch(() => {
-        this.setState({
-          processing: false,
-        });
-      });
-  }
-
   loadStaffData() {
-    const { token, itemId } = this.props;
+    const { token, productionId } = this.props;
 
     this.setState({
       loading: true,
@@ -447,46 +195,26 @@ class Main extends Component {
       },
       body: JSON.stringify({
         query: `{
-          event(filter: {id: {eq: "${itemId}"}}) {
-            production {
+          production(filter: {id: {eq: "${productionId}"}}) {
+            id
+            titles {
               id
-              titles {
-                id
-                title
-                staff {
-                  id 
-                  field {
-                    id
-                    title
-                  }
-                }
-              }
+              title
               staff {
                 id
-                staff {
-                  id
-                  field {
-                    id
-                    title
-                  }
-                },
-                artist{
-                  firstName
-                  name
+                field {
+                  title
                 }
               }
-            },
+            }
             staff {
               id
               staff {
                 id
-                staff {
-                  id
-                  field {
-                    id
-                    title
-                  }
-                }
+              }
+              artist{
+                firstName
+                name
               }
             }
           }
@@ -494,40 +222,19 @@ class Main extends Component {
           `,
       }),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         this.setState({
           loading: false,
-          data: res.data.event,
+          data: res.data.production,
         });
       })
-      .catch((error) => {
+      .catch(error => {
         this.setState({
           loading: false,
         });
         console.log(error);
       });
-  }
-
-  updateStaffData(items, staffsLinks) {
-    const { data } = this.state;
-
-    const newData = { ...data };
-    items.forEach((item, i) => {
-      const newRecord = {
-        id: item.id,
-        staff: {
-          id: item.staff,
-          staff: {
-            id: staffsLinks[i].staff.id,
-            field: staffsLinks[i].staff.field,
-          },
-        },
-      };
-      newData.staff.push(newRecord);
-    });
-
-    return newData;
   }
 
   render() {
@@ -538,40 +245,30 @@ class Main extends Component {
       return <div className="container">Načítám data...</div>;
     }
 
-    if (fieldPath === 'roles') {
+    if (fieldPath.substr(0, 5) === 'roles') {
       return (
         <div className="container">
           <ul>
-            {data.production.titles.map((title) => (
+            {data.titles.map(title => (
               <li key={`title_${title.id}`}>
                 <div>
                   <h2>Titul: {title.title}</h2>
                   <button
                     type="button"
-                    onClick={() => {
-                      this.addRoles(
-                        data.production.roles.filter(
-                          (r) => !data.roles.find((rr) => rr.role.id === r.id),
-                        ),
-                      );
-                    }}
+                    onClick={() =>
+                      this.setState({ selected: data.roles.map(r => r.id) })
+                    }
                   >
                     Zaškrtnout vše
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      this.removeRoles();
-                    }}
+                    onClick={() => this.setState({ selected: [] })}
                   >
                     Odškrtnout vše
                   </button>
                 </div>
-                <ul>
-                  {title.roles.map((role) =>
-                    this.getRoleRow(role, data.production.roles),
-                  )}
-                </ul>
+                <ul>{title.roles.map(role => this.getRoleRow(role))}</ul>
               </li>
             ))}
           </ul>
@@ -583,36 +280,26 @@ class Main extends Component {
       return (
         <div className="container">
           <ul>
-            {data.production.titles.map((title) => (
+            {data.titles.map(title => (
               <li key={`title_${title.id}`}>
                 <div>
                   <h2>Titul: {title.title}</h2>
                   <button
                     type="button"
-                    onClick={() => {
-                      this.addStaffs(
-                        data.production.staff.filter(
-                          (s) => !data.staff.find((ss) => ss.staff.id === s.id),
-                        ),
-                      );
-                    }}
+                    onClick={() =>
+                      this.setState({ selected: data.staff.map(s => s.id) })
+                    }
                   >
                     Zaškrtnout vše
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      this.removeStaffs();
-                    }}
+                    onClick={() => this.setState({ selected: [] })}
                   >
                     Odškrtnout vše
                   </button>
                 </div>
-                <ul>
-                  {title.staff.map((staff) =>
-                    this.getStaffRow(staff, data.production.staff),
-                  )}
-                </ul>
+                <ul>{title.staff.map(staff => this.getStaffRow(staff))}</ul>
               </li>
             ))}
           </ul>
@@ -626,10 +313,10 @@ class Main extends Component {
 
 Main.propTypes = {
   token: PropTypes.string,
-  itemId: PropTypes.string,
   fieldPath: PropTypes.string,
   setFieldValue: PropTypes.func,
   getFieldValue: PropTypes.func,
+  productionId: PropTypes.string,
 };
 
 export default Main;
