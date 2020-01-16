@@ -253,7 +253,7 @@ class Main extends Component {
       return (
         <div className="container">
           <ul>
-            {data.titles.map(title => (
+            {data && Array.isArray(data.titles) && data.titles.map(title => (
               <li key={`title_${title.id}`}>
                 <div>
                   <h2>Titul: {title.title}</h2>
@@ -273,7 +273,7 @@ class Main extends Component {
                   </button>
                 </div>
                 <ul>
-                  {title && title.roles && (
+                  {title && Array.isArray(title.roles) && (
                     title.roles.map(role => this.getRoleRow(role))
                   )}
                 </ul>
@@ -307,7 +307,7 @@ class Main extends Component {
                     Odškrtnout vše
                   </button>
                 </div>
-                {title && title.staff && (
+                {title && Array.isArray(title.staff) && (
                   <ul>{title.staff.map(staff => this.getStaffRow(staff))}</ul>
                 )}
               </li>
