@@ -142,6 +142,10 @@ class Main extends Component {
   loadRolesData() {
     const { token, productionId } = this.props;
 
+    if (!productionId) {
+      return;
+    }
+
     this.setState({
       loading: true,
     });
