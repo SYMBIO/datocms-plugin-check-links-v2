@@ -67,7 +67,9 @@ class Main extends Component {
   }
 
   getRoleRow(role) {
-    const { data: { roles } } = this.state;
+    const {
+      data: { roles },
+    } = this.state;
     const productionRoles = roles.filter(r => r.role.id === role.id);
     const artistsRows = productionRoles.map(r => this.getArtistsRoleRow(r));
 
@@ -108,7 +110,9 @@ class Main extends Component {
   }
 
   getStaffRow(staf) {
-    const { data: { staff } } = this.state;
+    const {
+      data: { staff },
+    } = this.state;
     const productionStaff = staff.filter(s => s.staff.id === staf.id);
     const artistsRows = productionStaff.map(s => this.getArtistsStaffRow(s));
 
@@ -299,7 +303,9 @@ class Main extends Component {
                     Odškrtnout vše
                   </button>
                 </div>
-                <ul>{title.staff.map(staff => this.getStaffRow(staff))}</ul>
+                {title && title.staff && (
+                  <ul>{title.staff.map(staff => this.getStaffRow(staff))}</ul>
+                )}
               </li>
             ))}
           </ul>
