@@ -288,7 +288,7 @@ class Main extends Component {
       return (
         <div className="container">
           <ul>
-            {data.titles.map(title => (
+            {data && Array.isArray(data.titles) && data.titles.map(title => (
               <li key={`title_${title.id}`}>
                 <div>
                   <h2>Titul: {title.title}</h2>
