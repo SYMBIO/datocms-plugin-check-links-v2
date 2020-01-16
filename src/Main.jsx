@@ -5,6 +5,7 @@ import connectToDatoCms from './connectToDatoCms';
 import './style.css';
 
 @connectToDatoCms(plugin => ({
+  plugin,
   token: plugin.parameters.global.datoCmsApiToken,
   itemId: plugin.itemId,
   fieldPath: plugin.fieldPath,
@@ -23,7 +24,17 @@ class Main extends Component {
   }
 
   componentDidMount() {
-    const { fieldPath } = this.props;
+    const { plugin, fieldPath } = this.props;
+
+    plugin.addFieldChangeListener('production', () => {
+      if (fieldPath.substr(0, 5) === 'roles') {
+        this.loadRolesData();
+      }
+
+      if (fieldPath.substr(0, 5) === 'staff') {
+        this.loadStaffData();
+      }
+    });
 
     if (fieldPath.substr(0, 5) === 'roles') {
       this.loadRolesData();
@@ -186,6 +197,10 @@ class Main extends Component {
   loadStaffData() {
     const { token, productionId } = this.props;
 
+    if (!productionId) {
+      return;
+    }
+
     this.setState({
       loading: true,
     });
@@ -253,32 +268,34 @@ class Main extends Component {
       return (
         <div className="container">
           <ul>
-            {data && Array.isArray(data.titles) && data.titles.map(title => (
-              <li key={`title_${title.id}`}>
-                <div>
-                  <h2>Titul: {title.title}</h2>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      this.setState({ selected: data.roles.map(r => r.id) })
-                    }
-                  >
-                    Zaškrtnout vše
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => this.setState({ selected: [] })}
-                  >
-                    Odškrtnout vše
-                  </button>
-                </div>
-                <ul>
-                  {title && Array.isArray(title.roles) && (
-                    title.roles.map(role => this.getRoleRow(role))
-                  )}
-                </ul>
-              </li>
-            ))}
+            {data &&
+              Array.isArray(data.titles) &&
+              data.titles.map(title => (
+                <li key={`title_${title.id}`}>
+                  <div>
+                    <h2>Titul: {title.title}</h2>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        this.setState({ selected: data.roles.map(r => r.id) })
+                      }
+                    >
+                      Zaškrtnout vše
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => this.setState({ selected: [] })}
+                    >
+                      Odškrtnout vše
+                    </button>
+                  </div>
+                  <ul>
+                    {title &&
+                      Array.isArray(title.roles) &&
+                      title.roles.map(role => this.getRoleRow(role))}
+                  </ul>
+                </li>
+              ))}
           </ul>
         </div>
       );
@@ -288,30 +305,32 @@ class Main extends Component {
       return (
         <div className="container">
           <ul>
-            {data && Array.isArray(data.titles) && data.titles.map(title => (
-              <li key={`title_${title.id}`}>
-                <div>
-                  <h2>Titul: {title.title}</h2>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      this.setState({ selected: data.staff.map(s => s.id) })
-                    }
-                  >
-                    Zaškrtnout vše
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => this.setState({ selected: [] })}
-                  >
-                    Odškrtnout vše
-                  </button>
-                </div>
-                {title && Array.isArray(title.staff) && (
-                  <ul>{title.staff.map(staff => this.getStaffRow(staff))}</ul>
-                )}
-              </li>
-            ))}
+            {data &&
+              Array.isArray(data.titles) &&
+              data.titles.map(title => (
+                <li key={`title_${title.id}`}>
+                  <div>
+                    <h2>Titul: {title.title}</h2>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        this.setState({ selected: data.staff.map(s => s.id) })
+                      }
+                    >
+                      Zaškrtnout vše
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => this.setState({ selected: [] })}
+                    >
+                      Odškrtnout vše
+                    </button>
+                  </div>
+                  {title && Array.isArray(title.staff) && (
+                    <ul>{title.staff.map(staff => this.getStaffRow(staff))}</ul>
+                  )}
+                </li>
+              ))}
           </ul>
         </div>
       );
@@ -322,6 +341,7 @@ class Main extends Component {
 }
 
 Main.propTypes = {
+  plugin: PropTypes.any,
   token: PropTypes.string,
   fieldPath: PropTypes.string,
   setFieldValue: PropTypes.func,
