@@ -272,7 +272,11 @@ class Main extends Component {
                     Odškrtnout vše
                   </button>
                 </div>
-                <ul>{title.roles.map(role => this.getRoleRow(role))}</ul>
+                <ul>
+                  {title && title.roles && (
+                    title.roles.map(role => this.getRoleRow(role))
+                  )}
+                </ul>
               </li>
             ))}
           </ul>
