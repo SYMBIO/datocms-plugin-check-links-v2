@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import connectToDatoCms from './connectToDatoCms';
 import './style.css';
@@ -81,7 +82,8 @@ class Main extends Component {
     const {
       data: { roles },
     } = this.state;
-    const productionRoles = roles.filter(r => r.role.id === role.id);
+
+    const productionRoles = roles.filter(r => r.role.id === role.id && this.itemIsValid(r));
     const artistsRows = productionRoles.map(r => this.getArtistsRoleRow(r));
 
     if (artistsRows.length === 0) {
@@ -124,7 +126,7 @@ class Main extends Component {
     const {
       data: { staff },
     } = this.state;
-    const productionStaff = staff.filter(s => s.staff.id === staf.id);
+    const productionStaff = staff.filter(s => s.staff.id === staf.id && this.itemIsValid(s));
     const artistsRows = productionStaff.map(s => this.getArtistsStaffRow(s));
 
     if (artistsRows.length === 0) {
@@ -137,6 +139,13 @@ class Main extends Component {
         <ul>{artistsRows}</ul>
       </li>
     );
+  }
+
+  itemIsValid(item) {
+    const { getFieldValue } = this.props;
+    const start = moment(getFieldValue('start_at'));
+    return (!item.dateFrom || moment(item.dateFrom).isBefore(start)) &&
+      (!item.dateTo || moment(item.dateTo).endOf('day').isAfter(start));
   }
 
   loadRolesData() {
@@ -177,6 +186,8 @@ class Main extends Component {
                 firstName
                 name
               }
+              dateFrom
+              dateTo
             }
           }
         }
@@ -239,6 +250,8 @@ class Main extends Component {
                 firstName
                 name
               }
+              dateFrom
+              dateTo
             }
           }
         }
