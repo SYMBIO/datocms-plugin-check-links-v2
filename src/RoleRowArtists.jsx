@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 const RoleRowArtists = ({ role, selected, setSelected }) => (
   <li key={`artist_${role.id}`}>
     <label>
+      {console.log(role.name, role.artist.name)}
       <input
         type="checkbox"
         checked={selected.indexOf(role.id) !== -1}

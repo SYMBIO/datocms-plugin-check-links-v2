@@ -27,7 +27,7 @@ const StaffRow = ({ staff, staffs, selected, setSelected, startAt }) => {
   );
 
   useEffect(() => {
-    console.log(staff);
+    // console.log(staff);
   }, [staff, staffs]);
 
   if (artistsRows.length === 0) {
