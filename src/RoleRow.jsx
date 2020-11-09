@@ -8,17 +8,23 @@ const RoleRow = ({ role, roles, selected, setSelected, startAt }) => {
     r => r.role.id === role.id && itemIsValid(r, startAt),
   );
 
-  const artistsRows = productionRoles
-    .map(r =>
-      selected.indexOf(r.id) !== -1 ? (
+  const artistsRows = [];
+
+  // first add selected artist (in the order of selection)
+  selected.forEach(sel => {
+    const r = productionRoles.find(pr => pr.id === sel);
+    if (r) {
+      artistsRows.push(
         <RoleRowArtists
           role={r}
           selected={selected}
           setSelected={setSelected}
-        />
-      ) : null,
-    )
-    .filter(r => r);
+        />,
+      );
+    }
+  });
+
+  // add others (non-selected) artists
   artistsRows.push(
     ...productionRoles
       .map(r =>

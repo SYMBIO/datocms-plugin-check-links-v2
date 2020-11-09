@@ -8,18 +8,23 @@ const StaffRow = ({ staff, staffs, selected, setSelected, startAt }) => {
     s => s.staff.id === staff.id && itemIsValid(s, startAt),
   );
 
-  const artistsRows = productionStaffs
-    .map(s =>
-      selected.indexOf(s.id) !== -1 ? (
+  const artistsRows = [];
+
+  // first add selected artist (in the order of selection)
+  selected.forEach(sel => {
+    const s = productionStaffs.find(ps => ps.id === sel);
+    if (s) {
+      artistsRows.push(
         <StaffRowArtists
-          Staff={s}
+          staff={s}
           selected={selected}
           setSelected={setSelected}
-        />
-      ) : null,
-    )
-    .filter(s => s);
+        />,
+      );
+    }
+  });
 
+  // add others (non-selected) artists
   artistsRows.push(
     ...productionStaffs
       .map(s =>

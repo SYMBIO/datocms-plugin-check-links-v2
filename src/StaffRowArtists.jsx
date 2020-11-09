@@ -1,28 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const StaffRowArtists = ({ Staff, selected, setSelected }) => (
-  <li key={`artist_${Staff.id}`}>
+const StaffRowArtists = ({ staff, selected, setSelected }) => (
+  <li key={`artist_${staff.id}`}>
     <label>
       <input
         type="checkbox"
-        checked={selected.indexOf(Staff.id) !== -1}
+        checked={selected.indexOf(staff.id) !== -1}
         onChange={() => {
-          if (selected.indexOf(Staff.id) !== -1) {
-            const newSelected = selected.filter(r => r !== Staff.id);
+          if (selected.indexOf(staff.id) !== -1) {
+            const newSelected = selected.filter(r => r !== staff.id);
             setSelected(newSelected);
           } else {
-            setSelected([...selected, Staff.id]);
+            setSelected([...selected, staff.id]);
           }
         }}
       />
-      {Staff.artist.firstName} {Staff.artist.name}
+      {staff.artist.firstName} {staff.artist.name}
     </label>
   </li>
 );
 
 StaffRowArtists.propTypes = {
-  Staff: PropTypes.shape({
+  staff: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     artist: PropTypes.shape({
