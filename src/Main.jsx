@@ -220,7 +220,9 @@ class Main extends Component {
                           role={role}
                           roles={data.roles}
                           selected={selected}
-                          setState={this.setState}
+                          setSelected={newSelected => {
+                            this.setState({ selected: newSelected });
+                          }}
                           startAt={getFieldValue('start_at')}
                         />
                       ))}
@@ -265,7 +267,9 @@ class Main extends Component {
                           staff={staff}
                           staffs={data.staff}
                           selected={selected}
-                          setState={this.setState}
+                          setSelected={newSelected => {
+                            this.setState({ selected: newSelected });
+                          }}
                           startAt={getFieldValue('start_at')}
                         />
                       ))}

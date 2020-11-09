@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import itemIsValid from './itemIsValid';
 import RoleRowArtists from './RoleRowArtists';
 
-const RoleRow = ({ role, roles, selected, setState, startAt }) => {
+const RoleRow = ({ role, roles, selected, setSelected, startAt }) => {
   const productionRoles = roles.filter(
     r => r.role.id === role.id && itemIsValid(r, startAt),
   );
@@ -11,7 +11,7 @@ const RoleRow = ({ role, roles, selected, setState, startAt }) => {
   const artistsRows = productionRoles
     .map(r =>
       (selected.indexOf(role.id) !== -1 ? (
-        <RoleRowArtists role={r} selected={selected} setState={setState} />
+        <RoleRowArtists role={r} selected={selected} setSelected={setSelected} />
       ) : null),
     )
     .filter(r => r);
@@ -19,7 +19,7 @@ const RoleRow = ({ role, roles, selected, setState, startAt }) => {
     ...productionRoles
       .map(r =>
         (selected.indexOf(role.id) === -1 ? (
-          <RoleRowArtists role={r} selected={selected} setState={setState} />
+          <RoleRowArtists role={r} selected={selected} setSelected={setSelected} />
         ) : null),
       )
       .filter(r => r),
@@ -53,7 +53,7 @@ RoleRow.propTypes = {
     }),
   ).isRequired,
   selected: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
-  setState: PropTypes.func.isRequired,
+  setSelected: PropTypes.func.isRequired,
   startAt: PropTypes.string.isRequired,
 };
 

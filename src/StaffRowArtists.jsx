@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const StaffRowArtists = ({ Staff, selected, setState }) => (
+const StaffRowArtists = ({ Staff, selected, setSelected }) => (
   <li key={`artist_${Staff.id}`}>
     <label>
       <input
@@ -10,9 +10,9 @@ const StaffRowArtists = ({ Staff, selected, setState }) => (
         onChange={() => {
           if (selected.indexOf(Staff.id) !== -1) {
             const newSelected = selected.filter(r => r !== Staff.id);
-            setState({ selected: newSelected });
+            setSelected(newSelected);
           } else {
-            setState({ selected: [...selected, Staff.id] });
+            setSelected([...selected, Staff.id]);
           }
         }}
       />
@@ -31,7 +31,7 @@ StaffRowArtists.propTypes = {
     }).isRequired,
   }).isRequired,
   selected: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
-  setState: PropTypes.func.isRequired,
+  setSelected: PropTypes.func.isRequired,
 };
 
 export default StaffRowArtists;
