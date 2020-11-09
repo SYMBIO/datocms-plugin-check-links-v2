@@ -1,5 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackIncludeAssetsPlugin = require('html-webpack-include-assets-plugin');
+const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -53,13 +53,12 @@ module.exports = {
       title: 'DatoCMS plugin',
       minify: isProduction,
     }),
-    new HtmlWebpackIncludeAssetsPlugin({
-      append: false,
-      publicPath: '',
-      assets: [
+    new HtmlWebpackTagsPlugin({
+      tags: [
         'https://unpkg.com/datocms-plugins-sdk/dist/sdk.js',
         'https://unpkg.com/datocms-plugins-sdk/dist/sdk.css',
       ],
+      append: false,
     }),
   ].filter(Boolean),
 };

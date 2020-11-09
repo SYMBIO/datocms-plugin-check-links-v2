@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 
 import connectToDatoCms from './connectToDatoCms';
 import './style.css';
+import RoleRow from './RoleRow';
+import StaffRow from './StaffRow';
 
 @connectToDatoCms(plugin => ({
   plugin,
@@ -52,100 +53,6 @@ class Main extends Component {
       const { setFieldValue, fieldPath } = this.props;
       setFieldValue(fieldPath, selected);
     }
-  }
-
-  getArtistsRoleRow(role) {
-    const { selected } = this.state;
-
-    return (
-      <li key={`artist_${role.id}`}>
-        <label>
-          <input
-            type="checkbox"
-            checked={selected.indexOf(role.id) !== -1}
-            onChange={() => {
-              if (selected.indexOf(role.id) !== -1) {
-                const newSelected = selected.filter(r => r !== role.id);
-                this.setState({ selected: newSelected });
-              } else {
-                this.setState({ selected: [...selected, role.id] });
-              }
-            }}
-          />
-          {role.artist.firstName} {role.artist.name}
-        </label>
-      </li>
-    );
-  }
-
-  getRoleRow(role) {
-    const {
-      data: { roles },
-    } = this.state;
-
-    const productionRoles = roles.filter(r => r.role.id === role.id && this.itemIsValid(r));
-    const artistsRows = productionRoles.map(r => this.getArtistsRoleRow(r));
-
-    if (artistsRows.length === 0) {
-      return <></>;
-    }
-
-    return (
-      <li key={`title_role${role.id}`}>
-        <h3>{role.name}</h3>
-        <ul>{artistsRows}</ul>
-      </li>
-    );
-  }
-
-  getArtistsStaffRow(staff) {
-    const { selected } = this.state;
-
-    return (
-      <li key={`artist_${staff.id}`}>
-        <label>
-          <input
-            type="checkbox"
-            checked={selected.indexOf(staff.id) !== -1}
-            onChange={() => {
-              if (selected.indexOf(staff.id) !== -1) {
-                const newSelected = selected.filter(s => s !== staff.id);
-                this.setState({ selected: newSelected });
-              } else {
-                this.setState({ selected: [...selected, staff.id] });
-              }
-            }}
-          />
-          {staff.artist.firstName} {staff.artist.name}
-        </label>
-      </li>
-    );
-  }
-
-  getStaffRow(staf) {
-    const {
-      data: { staff },
-    } = this.state;
-    const productionStaff = staff.filter(s => s.staff.id === staf.id && this.itemIsValid(s));
-    const artistsRows = productionStaff.map(s => this.getArtistsStaffRow(s));
-
-    if (artistsRows.length === 0) {
-      return <></>;
-    }
-
-    return (
-      <li key={`title_role${staf.id}`}>
-        <h3>{staf.field.title}</h3>
-        <ul>{artistsRows}</ul>
-      </li>
-    );
-  }
-
-  itemIsValid(item) {
-    const { getFieldValue } = this.props;
-    const start = moment(getFieldValue('start_at'));
-    return (!item.dateFrom || moment(item.dateFrom).isBefore(start)) &&
-      (!item.dateTo || moment(item.dateTo).endOf('day').isAfter(start));
   }
 
   loadRolesData() {
@@ -274,7 +181,7 @@ class Main extends Component {
   }
 
   render() {
-    const { loading, data } = this.state;
+    const { loading, data, selected } = this.state;
     const { fieldPath } = this.props;
 
     if (loading) {
@@ -306,11 +213,18 @@ class Main extends Component {
                       Odškrtnout vše
                     </button>
                   </div>
-                  <ul>
-                    {title &&
-                      Array.isArray(title.roles) &&
-                      title.roles.map(role => this.getRoleRow(role))}
-                  </ul>
+                  {title && Array.isArray(title.roles) && (
+                    <ul>
+                      {title.roles.map(role => (
+                        <RoleRow
+                          role={role}
+                          roles={data.roles}
+                          selected={selected}
+                          setState={this.setState}
+                        />
+                      ))}
+                    </ul>
+                  )}
                 </li>
               ))}
           </ul>
@@ -344,7 +258,16 @@ class Main extends Component {
                     </button>
                   </div>
                   {title && Array.isArray(title.staff) && (
-                    <ul>{title.staff.map(staff => this.getStaffRow(staff))}</ul>
+                    <ul>
+                      {title.staff.map(staff => (
+                        <StaffRow
+                          staff={staff}
+                          staffs={data.staff}
+                          selected={selected}
+                          setState={this.setState}
+                        />
+                      ))}
+                    </ul>
                   )}
                 </li>
               ))}
