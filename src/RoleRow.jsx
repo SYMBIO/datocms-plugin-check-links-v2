@@ -26,7 +26,7 @@ const RoleRow = ({ role, roles, selected, setState, startAt }) => {
   );
 
   useEffect(() => {
-    console.log(role, roles);
+    console.log(role, productionRoles);
   }, [role, roles]);
 
   if (artistsRows.length === 0) {
