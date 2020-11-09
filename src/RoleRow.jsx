@@ -10,17 +10,25 @@ const RoleRow = ({ role, roles, selected, setSelected, startAt }) => {
 
   const artistsRows = productionRoles
     .map(r =>
-      (selected.indexOf(role.id) !== -1 ? (
-        <RoleRowArtists role={r} selected={selected} setSelected={setSelected} />
-      ) : null),
+      selected.indexOf(r.id) !== -1 ? (
+        <RoleRowArtists
+          role={r}
+          selected={selected}
+          setSelected={setSelected}
+        />
+      ) : null,
     )
     .filter(r => r);
   artistsRows.push(
     ...productionRoles
       .map(r =>
-        (selected.indexOf(role.id) === -1 ? (
-          <RoleRowArtists role={r} selected={selected} setSelected={setSelected} />
-        ) : null),
+        selected.indexOf(r.id) === -1 ? (
+          <RoleRowArtists
+            role={r}
+            selected={selected}
+            setSelected={setSelected}
+          />
+        ) : null,
       )
       .filter(r => r),
   );
@@ -49,7 +57,10 @@ RoleRow.propTypes = {
   roles: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
+      artist: PropTypes.shape({
+        firstName: PropTypes.string,
+        name: PropTypes.string.isRequired,
+      }).isRequired,
     }),
   ).isRequired,
   selected: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,

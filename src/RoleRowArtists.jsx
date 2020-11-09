@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const RoleRowArtists = ({ role, selected, setSelected }) => (
   <li key={`artist_${role.id}`}>
     <label>
-      {console.log(role.name, role.artist.name)}
+      {console.log(role.artist.name)}
       <input
         type="checkbox"
         checked={selected.indexOf(role.id) !== -1}
@@ -25,7 +25,6 @@ const RoleRowArtists = ({ role, selected, setSelected }) => (
 RoleRowArtists.propTypes = {
   role: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
     artist: PropTypes.shape({
       firstName: PropTypes.string,
       name: PropTypes.string.isRequired,

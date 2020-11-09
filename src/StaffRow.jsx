@@ -9,19 +9,27 @@ const StaffRow = ({ staff, staffs, selected, setSelected, startAt }) => {
   );
 
   const artistsRows = productionStaffs
-    .map(r =>
-      (selected.indexOf(staff.id) !== -1 ? (
-        <StaffRowArtists Staff={r} selected={selected} setSelected={setSelected} />
-      ) : null),
+    .map(s =>
+      selected.indexOf(s.id) !== -1 ? (
+        <StaffRowArtists
+          Staff={s}
+          selected={selected}
+          setSelected={setSelected}
+        />
+      ) : null,
     )
     .filter(s => s);
 
   artistsRows.push(
     ...productionStaffs
-      .map(r =>
-        (selected.indexOf(staff.id) === -1 ? (
-          <StaffRowArtists Staff={r} selected={selected} setSelected={setSelected} />
-        ) : null),
+      .map(s =>
+        selected.indexOf(s.id) === -1 ? (
+          <StaffRowArtists
+            Staff={s}
+            selected={selected}
+            setSelected={setSelected}
+          />
+        ) : null,
       )
       .filter(s => s),
   );
@@ -50,7 +58,10 @@ StaffRow.propTypes = {
   staffs: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
+      artist: PropTypes.shape({
+        firstName: PropTypes.string,
+        name: PropTypes.string.isRequired,
+      }).isRequired,
     }),
   ).isRequired,
   selected: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
