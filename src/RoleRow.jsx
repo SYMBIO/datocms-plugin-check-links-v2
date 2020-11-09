@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import itemIsValid from './itemIsValid';
 import RoleRowArtists from './RoleRowArtists';
 
-const RoleRow = ({ role, roles, selected, setState }) => {
+const RoleRow = ({ role, roles, selected, setState, startAt }) => {
   const productionRoles = roles.filter(
-    r => r.role.id === role.id && itemIsValid(r),
+    r => r.role.id === role.id && itemIsValid(r, startAt),
   );
 
   const artistsRows = productionRoles
@@ -54,6 +54,7 @@ RoleRow.propTypes = {
   ).isRequired,
   selected: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
   setState: PropTypes.func.isRequired,
+  startAt: PropTypes.string.isRequired,
 };
 
 export default RoleRow;

@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import itemIsValid from './itemIsValid';
 import StaffRowArtists from './StaffRowArtists';
 
-const StaffRow = ({ staff, staffs, selected, setState }) => {
+const StaffRow = ({ staff, staffs, selected, setState, startAt }) => {
   const productionStaffs = staffs.filter(
-    s => s.staff.id === staff.id && itemIsValid(s),
+    s => s.staff.id === staff.id && itemIsValid(s,startAt),
   );
 
   const artistsRows = productionStaffs
@@ -55,6 +55,7 @@ StaffRow.propTypes = {
   ).isRequired,
   selected: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
   setState: PropTypes.func.isRequired,
+  startAt: PropTypes.string.isRequired,
 };
 
 export default StaffRow;

@@ -182,7 +182,7 @@ class Main extends Component {
 
   render() {
     const { loading, data, selected } = this.state;
-    const { fieldPath } = this.props;
+    const { fieldPath, getFieldValue } = this.props;
 
     if (loading) {
       return <div className="container">Načítám data...</div>;
@@ -221,6 +221,7 @@ class Main extends Component {
                           roles={data.roles}
                           selected={selected}
                           setState={this.setState}
+                          startAt={getFieldValue('start_at')}
                         />
                       ))}
                     </ul>
@@ -265,6 +266,7 @@ class Main extends Component {
                           staffs={data.staff}
                           selected={selected}
                           setState={this.setState}
+                          startAt={getFieldValue('start_at')}
                         />
                       ))}
                     </ul>
