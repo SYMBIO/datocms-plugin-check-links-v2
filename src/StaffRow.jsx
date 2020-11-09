@@ -5,7 +5,7 @@ import StaffRowArtists from './StaffRowArtists';
 
 const StaffRow = ({ staff, staffs, selected, setState, startAt }) => {
   const productionStaffs = staffs.filter(
-    s => s.staff.id === staff.id && itemIsValid(s,startAt),
+    s => s.staff.id === staff.id && itemIsValid(s, startAt),
   );
 
   const artistsRows = productionStaffs
