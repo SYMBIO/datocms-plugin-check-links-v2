@@ -30,7 +30,7 @@ const StaffRow = ({ staff, staffs, selected, setSelected, startAt }) => {
       .map(s =>
         selected.indexOf(s.id) === -1 && s ? (
           <StaffRowArtists
-            Staff={s}
+            staff={s}
             selected={selected}
             setSelected={setSelected}
           />
