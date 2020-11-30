@@ -28,7 +28,7 @@ const RoleRow = ({ role, roles, selected, setSelected, startAt }) => {
   artistsRows.push(
     ...productionRoles
       .map(r =>
-        selected.indexOf(r.id) === -1 ? (
+        selected.indexOf(r.id) === -1 && r ? (
           <RoleRowArtists
             role={r}
             selected={selected}
