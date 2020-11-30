@@ -28,7 +28,7 @@ const StaffRow = ({ staff, staffs, selected, setSelected, startAt }) => {
   artistsRows.push(
     ...productionStaffs
       .map(s =>
-        selected.indexOf(s.id) === -1 ? (
+        selected.indexOf(s.id) === -1 && s ? (
           <StaffRowArtists
             Staff={s}
             selected={selected}
