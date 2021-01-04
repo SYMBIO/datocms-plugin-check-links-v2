@@ -188,7 +188,7 @@ class Main extends Component {
       x: 0,
       y: 0,
     };
-    // const { getFieldValue, setFieldValue, fieldPath, fieldName } = this.props;
+    const { getFieldValue, fieldPath } = this.props;
     // const { data } = this.state;
 
     interact('.dropzone').dropzone({
@@ -204,10 +204,11 @@ class Main extends Component {
         event.relatedTarget.classList.remove('can-drop');
       },
       ondrop(event) {
-        // const currentFieldValue = getFieldValue(fieldPath);
+        const currentFieldValue = getFieldValue(fieldPath);
+        console.log(currentFieldValue);
         console.log('drop to', event.target);
 
-        event.relatedTarget.classList.toggle('can-drop');
+        event.relatedTarget.classList.remove('can-drop');
         // setFieldValue(fieldPath, currentFieldValue);
       },
       ondropdeactivate(event) {
