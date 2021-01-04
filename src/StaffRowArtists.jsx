@@ -2,23 +2,30 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const StaffRowArtists = ({ staff, selected, setSelected }) => (
-  <li key={`artist_${staff.id}`}>
-    <label>
-      <input
-        type="checkbox"
-        checked={selected.indexOf(staff.id) !== -1}
-        onChange={() => {
-          if (selected.indexOf(staff.id) !== -1) {
-            const newSelected = selected.filter(r => r !== staff.id);
-            setSelected(newSelected);
-          } else {
-            setSelected([...selected, staff.id]);
-          }
-        }}
-      />
-      {staff.artist.firstName} {staff.artist.name}
-    </label>
-  </li>
+  <>
+    <li
+      key={`artist_dropzone_${staff.id}`}
+      className="dropzone"
+      id={`dropzone_${staff.id}`}
+    />
+    <li key={`artist_${staff.id}`} className="draggable">
+      <label>
+        <input
+          type="checkbox"
+          checked={selected.indexOf(staff.id) !== -1}
+          onChange={() => {
+            if (selected.indexOf(staff.id) !== -1) {
+              const newSelected = selected.filter(r => r !== staff.id);
+              setSelected(newSelected);
+            } else {
+              setSelected([...selected, staff.id]);
+            }
+          }}
+        />
+        {staff.artist.firstName} {staff.artist.name}
+      </label>
+    </li>
+  </>
 );
 
 StaffRowArtists.propTypes = {

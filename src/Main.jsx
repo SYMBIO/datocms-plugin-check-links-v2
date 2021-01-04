@@ -275,11 +275,6 @@ class Main extends Component {
                     <ul>
                       {title.roles.map(role => (
                         <>
-                          <div
-                            className="dropzone"
-                            key={`dropzone_${title.id}_${role.id}`}
-                            id={`dropzone_${title.id}_${role.id}`}
-                          />
                           <RoleRow
                             role={role}
                             roles={data.roles}

@@ -50,7 +50,10 @@ const StaffRow = ({ staff, staffs, selected, setSelected, startAt }) => {
   return (
     <li key={`title_Staff${staff.id}`}>
       <h3>{staff.name}</h3>
-      <ul>{artistsRows}</ul>
+      <ul>
+        {artistsRows}
+        <li className="dropzone" id="dropzone_last" />
+      </ul>
     </li>
   );
 };
