@@ -31,20 +31,20 @@ class Main extends Component {
 
     plugin.addFieldChangeListener('production', () => {
       if (fieldPath.substr(0, 5) === 'roles') {
-        this.loadRolesData();
+        this.loadRolesData(this.initilizeDragHandler);
       }
 
       if (fieldPath.substr(0, 5) === 'staff') {
-        this.loadStaffData();
+        this.loadStaffData(this.initilizeDragHandler);
       }
     });
 
     if (fieldPath.substr(0, 5) === 'roles') {
-      this.loadRolesData();
+      this.loadRolesData(this.initilizeDragHandler);
     }
 
     if (fieldPath.substr(0, 5) === 'staff') {
-      this.loadStaffData();
+      this.loadStaffData(this.initilizeDragHandler);
     }
   }
 
@@ -56,7 +56,7 @@ class Main extends Component {
     }
   }
 
-  loadRolesData() {
+  loadRolesData(callback) {
     const { token, productionId } = this.props;
 
     if (!productionId) {
@@ -108,6 +108,7 @@ class Main extends Component {
           loading: false,
           data: res.data.production,
         });
+        callback();
       })
       .catch(error => {
         this.setState({
@@ -117,7 +118,7 @@ class Main extends Component {
       });
   }
 
-  loadStaffData() {
+  loadStaffData(callback) {
     const { token, productionId } = this.props;
 
     if (!productionId) {
@@ -172,6 +173,7 @@ class Main extends Component {
           loading: false,
           data: res.data.production,
         });
+        callback();
       })
       .catch(error => {
         this.setState({
