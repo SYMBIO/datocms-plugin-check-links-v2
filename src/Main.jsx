@@ -195,13 +195,13 @@ class Main extends Component {
       overlap: 0.05,
 
       ondropactivate(event) {
-        event.target.classList.toggle('drop-active');
+        event.target.classList.add('drop-active');
       },
       ondragenter(event) {
-        event.relatedTarget.classList.toggle('can-drop');
+        event.relatedTarget.classList.add('can-drop');
       },
       ondragleave(event) {
-        event.relatedTarget.classList.toggle('can-drop');
+        event.relatedTarget.classList.remove('can-drop');
       },
       ondrop(event) {
         // const currentFieldValue = getFieldValue(fieldPath);
@@ -212,7 +212,7 @@ class Main extends Component {
       },
       ondropdeactivate(event) {
         const e = event;
-        e.target.classList.toggle('drop-active');
+        e.target.classList.remove('drop-active');
         e.relatedTarget.style.transform = `translate(0px, -${position.y}px)`;
         position.y = 0;
       },

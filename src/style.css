@@ -53,7 +53,7 @@ ul li ul li ul li {
   background-color: white;
 }
 
-ul li ul li span{
+ul li ul li span {
   margin-right: 25px;
 }
 
@@ -66,7 +66,7 @@ ul li ul li ul li:hover {
   user-select: none;
 }
 
-.dropzone{
+.dropzone {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -77,12 +77,12 @@ ul li ul li ul li:hover {
   transition: 0.3s;
 }
 
-.drop-active{
+.drop-active {
   border: 2px dotted #ed6b5e;
   height: 1rem;
 }
 
-.can-drop{
+.can-drop {
   background-color: #ed6b5e;
   color: white;
 }
