@@ -48,7 +48,7 @@ const RoleRow = ({ role, roles, selected, setSelected, startAt }) => {
   }
 
   return (
-    <li key={`title_role${role.id}`} className={`RoleRow_${role.id}`}>
+    <li key={`title_role${role.id}`} className={`RoleRow_${role.id} draggable`}>
       <h3>{role.name}</h3>
       <ul>{artistsRows}</ul>
     </li>

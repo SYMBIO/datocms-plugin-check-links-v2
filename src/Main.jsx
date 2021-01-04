@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
+import interact from 'interactjs';
 import connectToDatoCms from './connectToDatoCms';
 import './style.css';
 import RoleRow from './RoleRow';
@@ -14,6 +14,7 @@ import StaffRow from './StaffRow';
   setFieldValue: plugin.setFieldValue,
   getFieldValue: plugin.getFieldValue,
   productionId: plugin.getFieldValue('production'),
+  fieldName: plugin.fieldName,
 }))
 class Main extends Component {
   constructor(props) {
@@ -180,6 +181,63 @@ class Main extends Component {
       });
   }
 
+  initilizeDragHandler() {
+    const position = {
+      x: 0,
+      y: 0,
+    };
+    // const { getFieldValue, setFieldValue, fieldPath, fieldName } = this.props;
+    // const { data } = this.state;
+
+    interact('.dropzone').dropzone({
+      overlap: 0.05,
+
+      ondropactivate(event) {
+        event.target.classList.toggle('drop-active');
+      },
+      ondragenter(event) {
+        event.relatedTarget.classList.toggle('can-drop');
+      },
+      ondragleave(event) {
+        event.relatedTarget.classList.toggle('can-drop');
+      },
+      ondrop(event) {
+        // const currentFieldValue = getFieldValue(fieldPath);
+        console.log('drop to', event.target);
+
+        event.relatedTarget.classList.toggle('can-drop');
+        // setFieldValue(fieldPath, currentFieldValue);
+      },
+      ondropdeactivate(event) {
+        const e = event;
+        e.target.classList.toggle('drop-active');
+        e.relatedTarget.style.transform = `translate(0px, -${position.y}px)`;
+        position.y = 0;
+      },
+    });
+
+    interact('.draggable').draggable({
+      modifiers: [
+        interact.modifiers.restrict({
+          restriction: 'ul li ul li ul',
+          endOnly: false,
+        }),
+      ],
+      startAxis: 'y',
+      lockAxis: 'y',
+      listeners: {
+        move(event) {
+          const draggableElement = event.target;
+
+          position.x += event.dx;
+          position.y += event.dy;
+
+          draggableElement.style.transform = `translate(${position.x}px, ${position.y}px)`;
+        },
+      },
+    });
+  }
+
   render() {
     const { loading, data, selected } = this.state;
     const { fieldPath, getFieldValue } = this.props;
@@ -216,15 +274,22 @@ class Main extends Component {
                   {title && Array.isArray(title.roles) && (
                     <ul>
                       {title.roles.map(role => (
-                        <RoleRow
-                          role={role}
-                          roles={data.roles}
-                          selected={selected}
-                          setSelected={newSelected => {
-                            this.setState({ selected: newSelected });
-                          }}
-                          startAt={getFieldValue('start_at')}
-                        />
+                        <>
+                          <div
+                            className="dropzone"
+                            key={`dropzone_${title.id}_${role.id}`}
+                            id={`dropzone_${title.id}_${role.id}`}
+                          />
+                          <RoleRow
+                            role={role}
+                            roles={data.roles}
+                            selected={selected}
+                            setSelected={newSelected => {
+                              this.setState({ selected: newSelected });
+                            }}
+                            startAt={getFieldValue('start_at')}
+                          />
+                        </>
                       ))}
                     </ul>
                   )}
@@ -263,15 +328,22 @@ class Main extends Component {
                   {title && Array.isArray(title.staff) && (
                     <ul>
                       {title.staff.map(staff => (
-                        <StaffRow
-                          staff={staff}
-                          staffs={data.staff}
-                          selected={selected}
-                          setSelected={newSelected => {
-                            this.setState({ selected: newSelected });
-                          }}
-                          startAt={getFieldValue('start_at')}
-                        />
+                        <>
+                          <div
+                            className="dropzone"
+                            key={`dropzone_${title.id}_${staff.id}`}
+                            id={`dropzone_${title.id}_${staff.id}`}
+                          />
+                          <StaffRow
+                            staff={staff}
+                            staffs={data.staff}
+                            selected={selected}
+                            setSelected={newSelected => {
+                              this.setState({ selected: newSelected });
+                            }}
+                            startAt={getFieldValue('start_at')}
+                          />
+                        </>
                       ))}
                     </ul>
                   )}
@@ -293,6 +365,7 @@ Main.propTypes = {
   setFieldValue: PropTypes.func,
   getFieldValue: PropTypes.func,
   productionId: PropTypes.string,
+  // fieldName: PropTypes.string,
 };
 
 export default Main;
