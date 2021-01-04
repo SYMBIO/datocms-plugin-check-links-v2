@@ -31,20 +31,20 @@ class Main extends Component {
 
     plugin.addFieldChangeListener('production', () => {
       if (fieldPath.substr(0, 5) === 'roles') {
-        this.loadRolesData(this.initilizeDragHandler);
+        this.loadRolesData(() => this.initilizeDragHandler());
       }
 
       if (fieldPath.substr(0, 5) === 'staff') {
-        this.loadStaffData(this.initilizeDragHandler);
+        this.loadStaffData(() => this.initilizeDragHandler());
       }
     });
 
     if (fieldPath.substr(0, 5) === 'roles') {
-      this.loadRolesData(this.initilizeDragHandler);
+      this.loadRolesData(() => this.initilizeDragHandler());
     }
 
     if (fieldPath.substr(0, 5) === 'staff') {
-      this.loadStaffData(this.initilizeDragHandler);
+      this.loadStaffData(() => this.initilizeDragHandler());
     }
   }
 
