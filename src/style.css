@@ -57,6 +57,10 @@ ul li ul li span{
   margin-right: 25px;
 }
 
+ul li ul li ul li:hover {
+  border: solid 1px #ddd;
+}
+
 .draggable{
   touch-action: none;
   user-select: none;
@@ -75,6 +79,7 @@ ul li ul li span{
 
 .drop-active{
   border: 2px dotted #ed6b5e;
+  height: 1rem;
 }
 
 .can-drop{

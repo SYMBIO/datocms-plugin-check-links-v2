@@ -7,6 +7,7 @@ const RoleRowArtists = ({ role, selected, setSelected }) => (
       key={`artist_dropzone_${role.id}`}
       className="dropzone"
       id={`dropzone_${role.id}`}
+      data-role={JSON.stringify(role)}
     />
     <li key={`artist_${role.id}`} className="draggable">
       <label>
