@@ -82,6 +82,6 @@ ul li ul li ul li:hover {
 }
 
 .can-drop {
-  background-color: #ed6b5e;
-  color: white;
+  border: 2px solid #ed6b5e;
+  height: 1rem;
 }

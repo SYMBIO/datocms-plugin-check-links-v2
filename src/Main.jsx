@@ -204,7 +204,7 @@ class Main extends Component {
       },
       ondragenter(event) {
         console.log('ondragenter', event.target, event.relatedTarget);
-        event.relatedTarget.classList.add('can-drop');
+        event.target.classList.add('can-drop');
       },
       ondragleave(event) {
         console.log('ondragleave', event.target, event.relatedTarget);
