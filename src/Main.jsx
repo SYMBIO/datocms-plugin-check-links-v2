@@ -195,14 +195,12 @@ class Main extends Component {
     interact('.dropzone').dropzone({
       overlap: 0.05,
 
-      accept({ draggableElement }) {
-        dragElement = draggableElement;
-        return true;
-      },
       ondropactivate(event) {
-        console.log('ondropactivate', event.target, event.relatedTarget);
-        console.log(dragElement);
-        event.target.classList.add('drop-active');
+        const dropzone = event.target;
+        dragElement = event.relatedTarget;
+        if (dropzone.parentElement === dragElement.parentElement) {
+          event.target.classList.add('drop-active');
+        }
       },
       ondragenter(event) {
         console.log('ondragenter', event.target, event.relatedTarget);
