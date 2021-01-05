@@ -189,33 +189,41 @@ class Main extends Component {
       y: 0,
     };
     const { getFieldValue, fieldPath } = this.props;
+    let dragElement = null;
     // const { data } = this.state;
 
     interact('.dropzone').dropzone({
       overlap: 0.05,
 
-      accept({ dropzone, draggableElement }) {
-        console.log(dropzone, draggableElement);
+      accept({ draggableElement }) {
+        dragElement = draggableElement;
         return true;
       },
       ondropactivate(event) {
+        console.log('ondropactivate', event.target, event.relatedTarget);
+        console.log(dragElement);
         event.target.classList.add('drop-active');
       },
       ondragenter(event) {
+        console.log('ondragenter', event.target, event.relatedTarget);
         event.relatedTarget.classList.add('can-drop');
       },
       ondragleave(event) {
+        console.log('ondragleave', event.target, event.relatedTarget);
         event.relatedTarget.classList.remove('can-drop');
       },
       ondrop(event) {
+        console.log('ondrop', event.target, event.relatedTarget);
         const currentFieldValue = getFieldValue(fieldPath);
         console.log(currentFieldValue);
         console.log('drop to', event.target);
 
         event.relatedTarget.classList.remove('can-drop');
         // setFieldValue(fieldPath, currentFieldValue);
+        dragElement = null;
       },
       ondropdeactivate(event) {
+        console.log('ondropdeactivate', event.target, event.relatedTarget);
         const e = event;
         e.target.classList.remove('drop-active');
         e.relatedTarget.style.transform = `translate(0px, -${position.y}px)`;
