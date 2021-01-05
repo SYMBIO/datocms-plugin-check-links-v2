@@ -194,6 +194,10 @@ class Main extends Component {
     interact('.dropzone').dropzone({
       overlap: 0.05,
 
+      accept({ dropzone, draggableElement }) {
+        console.log(dropzone, draggableElement);
+        return true;
+      },
       ondropactivate(event) {
         event.target.classList.add('drop-active');
       },
