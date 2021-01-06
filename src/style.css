@@ -57,7 +57,7 @@ ul li ul li span {
   margin-right: 25px;
 }
 
-ul li ul li ul li:hover {
+ul li ul li ul li.draggable:hover {
   border: solid 1px #ddd;
 }
 
