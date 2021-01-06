@@ -198,7 +198,11 @@ class Main extends Component {
       ondropactivate(event) {
         const dropzone = event.target;
         dragElement = event.relatedTarget;
-        if (dropzone.parentElement === dragElement.parentElement) {
+        if (
+          dropzone.parentElement === dragElement.parentElement &&
+          dropzone.nextSibling !== dragElement &&
+          dropzone.previousSibling !== dragElement
+        ) {
           event.target.classList.add('drop-active');
         }
       },
