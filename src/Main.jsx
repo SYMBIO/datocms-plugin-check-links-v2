@@ -224,9 +224,14 @@ class Main extends Component {
         dragElement.classList.remove('can-be-dropped');
       },
       ondrop(event) {
+        const dropzone = event.target;
+        const dragElement = event.relatedTarget;
         const currentFieldValue = getFieldValue(fieldPath);
         console.log(currentFieldValue);
-        console.log('drop before', event.target.id);
+        console.log('drop before', dropzone.id);
+
+        dragElement.style.transform = `translate(0px, -${position.y}px)`;
+        position.y = 0;
 
         event.relatedTarget.classList.remove('can-drop');
         // setFieldValue(fieldPath, currentFieldValue);
