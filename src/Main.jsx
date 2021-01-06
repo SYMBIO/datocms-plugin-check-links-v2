@@ -193,7 +193,7 @@ class Main extends Component {
     // const { data } = this.state;
 
     interact('.dropzone').dropzone({
-      overlap: 'center',
+      overlap: 0.01,
 
       ondropactivate(event) {
         const dropzone = event.target;
