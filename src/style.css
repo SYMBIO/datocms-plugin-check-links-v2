@@ -73,7 +73,7 @@ ul li ul li ul li.draggable:hover {
   justify-content: center;
   width: 100%;
   height: 2px;
-  border: none;
+  border: 2px dotted #fff;
 }
 
 .drop-active {
