@@ -83,3 +83,7 @@ ul li ul li ul li:hover {
 .can-drop {
   border: 2px solid #ed6b5e;
 }
+
+.can-be-dropped {
+  background-color: #88cc88;
+}

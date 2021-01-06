@@ -189,7 +189,6 @@ class Main extends Component {
       y: 0,
     };
     const { getFieldValue, fieldPath } = this.props;
-    let dragElement = null;
     // const { data } = this.state;
 
     interact('.dropzone').dropzone({
@@ -197,7 +196,7 @@ class Main extends Component {
 
       ondropactivate(event) {
         const dropzone = event.target;
-        dragElement = event.relatedTarget;
+        const dragElement = event.relatedTarget;
         if (
           dropzone.parentElement === dragElement.parentElement &&
           dropzone.nextSibling !== dragElement &&
@@ -208,35 +207,33 @@ class Main extends Component {
       },
       ondragenter(event) {
         const dropzone = event.target;
-        dragElement = event.relatedTarget;
+        const dragElement = event.relatedTarget;
         if (
           dropzone.parentElement === dragElement.parentElement &&
           dropzone.nextSibling !== dragElement &&
           dropzone.previousSibling !== dragElement
         ) {
           dropzone.classList.add('can-drop');
+          dragElement.classList.add('can-be-dropped');
         }
       },
       ondragleave(event) {
         const dropzone = event.target;
+        const dragElement = event.relatedTarget;
         dropzone.classList.remove('can-drop');
+        dragElement.classList.remove('can-be-dropped');
       },
       ondrop(event) {
-        console.log('ondrop', event.target, event.relatedTarget);
         const currentFieldValue = getFieldValue(fieldPath);
         console.log(currentFieldValue);
-        console.log('drop to', event.target);
+        console.log('drop before', event.target.id);
 
         event.relatedTarget.classList.remove('can-drop');
         // setFieldValue(fieldPath, currentFieldValue);
-        dragElement = null;
       },
       ondropdeactivate(event) {
-        console.log('ondropdeactivate', event.target, event.relatedTarget);
-        const e = event;
-        e.target.classList.remove('drop-active');
-        e.relatedTarget.style.transform = `translate(0px, -${position.y}px)`;
-        position.y = 0;
+        const dropzone = event.target;
+        dropzone.classList.remove('drop-active');
       },
     });
 
