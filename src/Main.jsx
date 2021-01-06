@@ -203,14 +203,23 @@ class Main extends Component {
           dropzone.nextSibling !== dragElement &&
           dropzone.previousSibling !== dragElement
         ) {
-          event.target.classList.add('drop-active');
+          dropzone.classList.add('drop-active');
         }
       },
       ondragenter(event) {
-        event.target.classList.add('can-drop');
+        const dropzone = event.target;
+        dragElement = event.relatedTarget;
+        if (
+          dropzone.parentElement === dragElement.parentElement &&
+          dropzone.nextSibling !== dragElement &&
+          dropzone.previousSibling !== dragElement
+        ) {
+          dropzone.classList.add('can-drop');
+        }
       },
       ondragleave(event) {
-        event.target.classList.remove('can-drop');
+        const dropzone = event.target;
+        dropzone.classList.remove('can-drop');
       },
       ondrop(event) {
         console.log('ondrop', event.target, event.relatedTarget);
