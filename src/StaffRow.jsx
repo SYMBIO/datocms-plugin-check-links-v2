@@ -61,7 +61,9 @@ const StaffRow = ({ staff, staffs, selected, setSelected, startAt }) => {
 StaffRow.propTypes = {
   staff: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
+    field: PropTypes.shape({
+      title: PropTypes.string.isRequired,
+    }),
   }).isRequired,
   staffs: PropTypes.arrayOf(
     PropTypes.shape({
