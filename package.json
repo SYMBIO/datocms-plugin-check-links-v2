@@ -1,5 +1,5 @@
 {
-  "name": "datocms-plugin-check-links-v2-test",
+  "name": "datocms-plugin-check-links-v2",
   "homepage": "https://github.com/SYMBIO/datocms-plugin-check-links-v2",
   "repository": {
     "type": "git",
@@ -31,7 +31,7 @@
   "author": "SYMBIO <dev@symbio.agency>",
   "license": "ISC",
   "datoCmsPlugin": {
-    "title": "Check Links V2 - Test",
+    "title": "Check Links V2",
     "previewImage": "docs/preview.gif",
     "coverImage": "docs/cover.png",
     "entryPoint": "dist/index.html",

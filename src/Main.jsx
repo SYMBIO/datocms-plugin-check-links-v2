@@ -209,9 +209,7 @@ class Main extends Component {
         const dropzone = event.target;
         const dragElement = event.relatedTarget;
         if (
-          dropzone.parentElement === dragElement.parentElement &&
-          dropzone.nextSibling !== dragElement &&
-          dropzone.previousSibling !== dragElement
+          dropzone.parentElement === dragElement.parentElement
         ) {
           dropzone.classList.add('drop-active');
         }
@@ -220,9 +218,7 @@ class Main extends Component {
         const dropzone = event.target;
         const dragElement = event.relatedTarget;
         if (
-          dropzone.parentElement === dragElement.parentElement &&
-          dropzone.nextSibling !== dragElement &&
-          dropzone.previousSibling !== dragElement
+          dropzone.parentElement === dragElement.parentElement
         ) {
           dropzone.classList.add('can-drop');
           dragElement.classList.add('can-be-dropped');
