@@ -1,5 +1,5 @@
 {
-  "name": "datocms-plugin-check-links-v2",
+  "name": "datocms-plugin-check-links-v2-test",
   "homepage": "https://github.com/SYMBIO/datocms-plugin-check-links-v2",
   "repository": {
     "type": "git",
@@ -9,7 +9,7 @@
   "description": "Selecting links by checking them",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"yarn dev\" \"yarn localtunnel\"",
+    "start": "NODE_ENV=development webpack-dev-server --port 5000",
     "localtunnel": "lt -s datocms-plugin-check-links -h https://tunnel.datahub.at --port 5000",
     "dev": "NODE_ENV=development webpack serve --port 5000",
     "build": "NODE_ENV=production webpack --progress",
@@ -31,7 +31,7 @@
   "author": "SYMBIO <dev@symbio.agency>",
   "license": "ISC",
   "datoCmsPlugin": {
-    "title": "Check Links V2",
+    "title": "Check Links V2 - Test",
     "previewImage": "docs/preview.gif",
     "coverImage": "docs/cover.png",
     "entryPoint": "dist/index.html",

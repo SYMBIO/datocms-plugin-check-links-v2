@@ -52,7 +52,6 @@ const RoleRow = ({ role, roles, selected, setSelected, startAt }) => {
       <h3>{role.name}</h3>
       <ul>
         {artistsRows}
-        <li className="dropzone" id="dropzone_last" />
       </ul>
     </li>
   );

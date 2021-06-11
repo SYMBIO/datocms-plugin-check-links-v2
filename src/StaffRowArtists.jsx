@@ -8,20 +8,20 @@ const StaffRowArtists = ({ staff, selected, setSelected }) => (
       className="dropzone"
       id={`dropzone_${staff.id}`}
     />
-    <li key={`artist_${staff.id}`} className="draggable">
+    <li key={`artist_${staff.id}`} id={`artist_${staff.id}`} className={selected.indexOf(staff.id) !== -1 ? 'draggable' : ''}>
+      <input
+        type="checkbox"
+        checked={selected.indexOf(staff.id) !== -1}
+        onChange={() => {
+          if (selected.indexOf(staff.id) !== -1) {
+            const newSelected = selected.filter(r => r !== staff.id);
+            setSelected(newSelected);
+          } else {
+            setSelected([...selected, staff.id]);
+          }
+        }}
+      />
       <label>
-        <input
-          type="checkbox"
-          checked={selected.indexOf(staff.id) !== -1}
-          onChange={() => {
-            if (selected.indexOf(staff.id) !== -1) {
-              const newSelected = selected.filter(r => r !== staff.id);
-              setSelected(newSelected);
-            } else {
-              setSelected([...selected, staff.id]);
-            }
-          }}
-        />
         {staff.artist.firstName} {staff.artist.name}
       </label>
     </li>

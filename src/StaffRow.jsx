@@ -52,7 +52,6 @@ const StaffRow = ({ staff, staffs, selected, setSelected, startAt }) => {
       <h3>{staff.field.title}</h3>
       <ul>
         {artistsRows}
-        <li className="dropzone" id="dropzone_last" />
       </ul>
     </li>
   );

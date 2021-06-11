@@ -9,20 +9,20 @@ const RoleRowArtists = ({ role, selected, setSelected }) => (
       id={`dropzone_${role.id}`}
       data-role={JSON.stringify(role)}
     />
-    <li key={`artist_${role.id}`} className="draggable">
+    <li key={`artist_${role.id}`} id={`artist_${role.id}`} className={selected.indexOf(role.id) !== -1 ? 'draggable' : ''}>
+      <input
+        type="checkbox"
+        checked={selected.indexOf(role.id) !== -1}
+        onChange={() => {
+          if (selected.indexOf(role.id) !== -1) {
+            const newSelected = selected.filter(r => r !== role.id);
+            setSelected(newSelected);
+          } else {
+            setSelected([...selected, role.id]);
+          }
+        }}
+      />
       <label>
-        <input
-          type="checkbox"
-          checked={selected.indexOf(role.id) !== -1}
-          onChange={() => {
-            if (selected.indexOf(role.id) !== -1) {
-              const newSelected = selected.filter(r => r !== role.id);
-              setSelected(newSelected);
-            } else {
-              setSelected([...selected, role.id]);
-            }
-          }}
-        />
         {role.artist.firstName} {role.artist.name}
       </label>
     </li>

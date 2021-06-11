@@ -39,6 +39,16 @@ class Main extends Component {
       }
     });
 
+    plugin.addFieldChangeListener(fieldPath, () => {
+      if (fieldPath.substr(0, 5) === 'roles') {
+        this.initilizeDragHandler();
+      }
+
+      if (fieldPath.substr(0, 5) === 'staff') {
+        this.initilizeDragHandler();
+      }
+    });
+
     if (fieldPath.substr(0, 5) === 'roles') {
       this.loadRolesData(() => this.initilizeDragHandler());
     }
@@ -50,9 +60,9 @@ class Main extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { selected } = this.state;
-    if (selected !== prevState.selected) {
+    if (selected.toString() !== prevState.selected.toString()) {
       const { setFieldValue, fieldPath } = this.props;
-      setFieldValue(fieldPath, selected);
+      setFieldValue(fieldPath, selected.filter((e) => e));
     }
   }
 
@@ -189,7 +199,8 @@ class Main extends Component {
       y: 0,
     };
     const { getFieldValue, fieldPath } = this.props;
-    // const { data } = this.state;
+    const { selected } = this.state;
+    const setSelected = (newSelected) => { this.setState({ selected: newSelected }); };
 
     interact('.dropzone').dropzone({
       overlap: 0.01,
@@ -233,7 +244,20 @@ class Main extends Component {
         position.y = 0;
         dropzone.classList.remove('can-drop');
         dragElement.classList.remove('can-be-dropped');
-        // setFieldValue(fieldPath, currentFieldValue);
+
+        // console.log(currentFieldValue);
+        let dropzoneArrayIndex = selected.indexOf(event.target.id.split('_')[1]);
+        dropzoneArrayIndex = dropzoneArrayIndex < 0 ? selected.length - 1 : dropzoneArrayIndex;
+        const draggableArrayIndex = selected.indexOf(event.relatedTarget.id.split('_')[1]);
+
+        const newSelected = [...selected];
+        [newSelected[dropzoneArrayIndex],
+          newSelected[draggableArrayIndex]] = [newSelected[draggableArrayIndex],
+          newSelected[dropzoneArrayIndex]];
+
+        console.log(dropzoneArrayIndex);
+
+        setSelected(newSelected);
       },
       ondropdeactivate(event) {
         const dropzone = event.target;
@@ -299,7 +323,7 @@ class Main extends Component {
                   {title && Array.isArray(title.roles) && (
                     <ul>
                       {title.roles.map(role => (
-                        <>
+                        <React.Fragment key={`role_${role.id}`}>
                           <RoleRow
                             role={role}
                             roles={data.roles}
@@ -309,7 +333,7 @@ class Main extends Component {
                             }}
                             startAt={getFieldValue('start_at')}
                           />
-                        </>
+                        </React.Fragment>
                       ))}
                     </ul>
                   )}
@@ -348,11 +372,11 @@ class Main extends Component {
                   {title && Array.isArray(title.staff) && (
                     <ul>
                       {title.staff.map(staff => (
-                        <>
+                        <React.Fragment key={`staff_${staff.id}`}>
                           <div
                             className="dropzone"
-                            key={`dropzone_${title.id}_${staff.id}`}
-                            id={`dropzone_${title.id}_${staff.id}`}
+                            key={`dropzone_${title.id}`}
+                            id={`dropzone_${title.id}`}
                           />
                           <StaffRow
                             staff={staff}
@@ -363,7 +387,7 @@ class Main extends Component {
                             }}
                             startAt={getFieldValue('start_at')}
                           />
-                        </>
+                        </React.Fragment>
                       ))}
                     </ul>
                   )}
